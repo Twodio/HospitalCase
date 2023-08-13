@@ -1,8 +1,10 @@
-﻿using HospitalCase.WebAPI.Models;
+﻿using HospitalCase.WebAPI.Interfaces;
+using HospitalCase.WebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HospitalCase.WebAPI.Controllers
 {
@@ -11,61 +13,50 @@ namespace HospitalCase.WebAPI.Controllers
     public class MedicalRecordsController : ControllerBase
     {
         private readonly ILogger<MedicalRecordsController> _logger;
-        private readonly ICollection<MedicalRecord> _medicalRecords;
+        private readonly IMedicalRecordRepository _medicalRecordsRepository;
 
-        public MedicalRecordsController(ILogger<MedicalRecordsController> logger, ICollection<MedicalRecord> medicalRecords)
+        public MedicalRecordsController(ILogger<MedicalRecordsController> logger, IMedicalRecordRepository medicalRecordsRepository)
         {
             _logger = logger;
-            _medicalRecords = medicalRecords;
+            _medicalRecordsRepository = medicalRecordsRepository;
         }
 
         // GET: api/<MedicalRecordsController>
         [HttpGet]
-        public IEnumerable<MedicalRecord> Get()
+        public async Task<IEnumerable<MedicalRecord>> Get()
         {
-            return _medicalRecords.AsEnumerable();
+            var result = await _medicalRecordsRepository.GetAllAsync();
+            return result;
         }
 
         // GET api/<MedicalRecordsController>/5
         [HttpGet("{id}")]
-        public MedicalRecord Get(int id)
+        public async Task<MedicalRecord> Get(int id)
         {
-            return _medicalRecords.SingleOrDefault(mr => mr.Id == id);
+            var result = await _medicalRecordsRepository.GetByIdAsync(id);
+
+            return result;
         }
 
         // POST api/<MedicalRecordsController>
         [HttpPost]
-        public void Post([FromBody] MedicalRecord medicalRecord)
+        public async void Post([FromBody] MedicalRecord medicalRecord)
         {
-            _medicalRecords.Add(medicalRecord);
+            await _medicalRecordsRepository.CreateAsync(medicalRecord);
         }
 
         // PUT api/<MedicalRecordsController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] MedicalRecord medicalRecord)
+        public async void Put(int id, [FromBody] MedicalRecord medicalRecord)
         {
-            var foundMedicalRecord = _medicalRecords.SingleOrDefault(mr => mr.Id == id);
-            if (foundMedicalRecord != null)
-            {
-                foundMedicalRecord.Patient = medicalRecord.Patient;
-                foundMedicalRecord.HealthcareProvider = medicalRecord.HealthcareProvider;
-                foundMedicalRecord.RecordDate = medicalRecord.RecordDate;
-                foundMedicalRecord.Symptoms = medicalRecord.Symptoms;
-                foundMedicalRecord.Diagnosis = medicalRecord.Diagnosis;
-                foundMedicalRecord.Treatment = medicalRecord.Treatment;
-                foundMedicalRecord.Notes = medicalRecord.Notes;
-            }
+            await _medicalRecordsRepository.UpdateAsync(id, medicalRecord);
         }
 
         // DELETE api/<MedicalRecordsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async void Delete(int id)
         {
-            var foundMedicalRecord = _medicalRecords.SingleOrDefault(mr => mr.Id == id);
-            if (foundMedicalRecord != null)
-            {
-                _medicalRecords.Remove(foundMedicalRecord);
-            }
+            await _medicalRecordsRepository.DeleteAsync(id);
         }
     }
 }

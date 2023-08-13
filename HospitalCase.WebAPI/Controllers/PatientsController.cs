@@ -1,8 +1,10 @@
-﻿using HospitalCase.WebAPI.Models;
+﻿using HospitalCase.WebAPI.Interfaces;
+using HospitalCase.WebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HospitalCase.WebAPI.Controllers
 {
@@ -11,58 +13,51 @@ namespace HospitalCase.WebAPI.Controllers
     public class PatientsController : ControllerBase
     {
         private readonly ILogger<PatientsController> _logger;
-        private readonly ICollection<Patient> _patients;
+        private readonly IPatientRepository _patientsRepository;
 
-        public PatientsController(ILogger<PatientsController> logger, ICollection<Patient> patients)
+        public PatientsController(ILogger<PatientsController> logger, IPatientRepository patientsRepository)
         {
             _logger = logger;
-            _patients = patients;
+            _patientsRepository = patientsRepository;
         }
 
         // GET: api/<PatientsController>
         [HttpGet]
-        public IEnumerable<Patient> Get()
+        public async Task<IEnumerable<Patient>> Get()
         {
-            return _patients.AsEnumerable();
+            var result = await _patientsRepository.GetAllAsync();
+
+            return result;
         }
 
         // GET api/<PatientsController>/5
         [HttpGet("{id}")]
-        public Patient Get(int id)
+        public async Task<Patient> Get(int id)
         {
-            return _patients.SingleOrDefault(p => p.Id == id);
+            var result = await _patientsRepository.GetByIdAsync(id);
+
+            return result;
         }
 
         // POST api/<PatientsController>
         [HttpPost]
-        public void Post(Patient patient)
+        public async void Post(Patient patient)
         {
-            _patients.Add(patient);
+            await _patientsRepository.CreateAsync(patient);
         }
 
         // PUT api/<PatientsController>/5
         [HttpPut("{id}")]
-        public void Put(int id, Patient patient)
+        public async void Put(int id, Patient patient)
         {
-            var foundPatient = _patients.SingleOrDefault(hp => hp.Id == id);
-            if (foundPatient != null)
-            {
-                foundPatient.FirstName = patient.FirstName;
-                foundPatient.LastName = patient.LastName;
-                foundPatient.BirthDate = patient.BirthDate;
-                foundPatient.PhoneNumber = patient.PhoneNumber;
-            }
+            await _patientsRepository.UpdateAsync(id, patient);
         }
 
         // DELETE api/<PatientsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async void Delete(int id)
         {
-            var foundPatient = _patients.SingleOrDefault(p => p.Id == id);
-            if (foundPatient != null)
-            {
-                _patients.Remove(foundPatient);
-            }
+            await _patientsRepository.DeleteAsync(id);
         }
     }
 }

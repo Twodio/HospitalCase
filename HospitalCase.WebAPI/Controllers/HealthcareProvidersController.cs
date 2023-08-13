@@ -1,9 +1,12 @@
-﻿using HospitalCase.WebAPI.Models;
+﻿using HospitalCase.WebAPI.Interfaces;
+using HospitalCase.WebAPI.Models;
+using HospitalCase.WebAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace HospitalCase.WebAPI.Controllers
 {
@@ -12,59 +15,51 @@ namespace HospitalCase.WebAPI.Controllers
     public class HealthcareProvidersController : ControllerBase
     {
         private readonly ILogger<HealthcareProvidersController> _logger;
-        private readonly ICollection<HealthcareProvider> _healthcareProviders;
+        private readonly IHealthcareProviderRepository _healthcareProvidersRepository;
 
-        public HealthcareProvidersController(ILogger<HealthcareProvidersController> logger, ICollection<HealthcareProvider> healthcareProviders)
+        public HealthcareProvidersController(ILogger<HealthcareProvidersController> logger, IHealthcareProviderRepository healthcareProvidersRepository)
         {
             _logger = logger;
-            _healthcareProviders = healthcareProviders;
+            _healthcareProvidersRepository = healthcareProvidersRepository;
         }
 
         // GET: api/<HealthcareProvidersControllers>
         [HttpGet]
-        public IEnumerable<HealthcareProvider> Get()
+        public async Task<IEnumerable<HealthcareProvider>> Get()
         {
-            return _healthcareProviders.AsEnumerable();
+            var result = await _healthcareProvidersRepository.GetAllAsync();
+
+            return result;
         }
 
         // GET api/<HealthcareProvidersControllers>/5
         [HttpGet("{id}")]
-        public HealthcareProvider Get(int id)
+        public async Task<HealthcareProvider> Get(int id)
         {
-            return _healthcareProviders.SingleOrDefault(hp => hp.Id == id);
+            var foundEntry = await _healthcareProvidersRepository.GetByIdAsync(id);
+
+            return foundEntry;
         }
 
         // POST api/<HealthcareProvidersControllers>
         [HttpPost]
-        public void Post([FromBody] HealthcareProvider healthcareProvider)
+        public async void Post([FromBody] HealthcareProvider healthcareProvider)
         {
-            _healthcareProviders.Add(healthcareProvider);
+            await _healthcareProvidersRepository.CreateAsync(healthcareProvider);
         }
 
         // PUT api/<HealthcareProvidersControllers>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] HealthcareProvider healthcareProvider)
+        public async void Put(int id, [FromBody] HealthcareProvider healthcareProvider)
         {
-            var foundHealthcareProvider = _healthcareProviders.SingleOrDefault(hp => hp.Id == id);
-            if (foundHealthcareProvider != null)
-            {
-                foundHealthcareProvider.FirstName = healthcareProvider.FirstName;
-                foundHealthcareProvider.LastName = healthcareProvider.LastName;
-                foundHealthcareProvider.BirthDate = healthcareProvider.BirthDate;
-                foundHealthcareProvider.PhoneNumber = healthcareProvider.PhoneNumber;
-                foundHealthcareProvider.Type = healthcareProvider.Type;
-            }
+            await _healthcareProvidersRepository.UpdateAsync(id, healthcareProvider);
         }
 
         // DELETE api/<HealthcareProvidersControllers>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async void Delete(int id)
         {
-            var foundHealthcareProvider = _healthcareProviders.SingleOrDefault(hp => hp.Id == id);
-            if (foundHealthcareProvider != null)
-            {
-                _healthcareProviders.Remove(foundHealthcareProvider);
-            }
+            await _healthcareProvidersRepository.DeleteAsync(id);
         }
     }
 }

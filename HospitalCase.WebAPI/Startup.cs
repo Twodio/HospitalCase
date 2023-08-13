@@ -1,4 +1,6 @@
+using HospitalCase.WebAPI.Interfaces;
 using HospitalCase.WebAPI.Models;
+using HospitalCase.WebAPI.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -70,9 +72,9 @@ namespace HospitalCase.WebAPI
                 }
             };
 
-            services.AddSingleton<ICollection<HealthcareProvider>>(healthcareproviders);
-            services.AddSingleton<ICollection<Patient>>(patients);
-            services.AddSingleton<ICollection<MedicalRecord>>(medicalRecords);
+            services.AddSingleton<IHealthcareProviderRepository>(new HealthcareProviderRepository(healthcareproviders));
+            services.AddSingleton<IPatientRepository>(new PatientRepository(patients));
+            services.AddSingleton<IMedicalRecordRepository>(new MedicalRecordRepository(medicalRecords));
 
             services.AddControllers();
         }
