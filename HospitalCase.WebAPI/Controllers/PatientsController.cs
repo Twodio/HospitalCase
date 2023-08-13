@@ -1,7 +1,9 @@
 ﻿using HospitalCase.WebAPI.Interfaces;
 using HospitalCase.WebAPI.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,41 +25,98 @@ namespace HospitalCase.WebAPI.Controllers
 
         // GET: api/<PatientsController>
         [HttpGet]
-        public async Task<IEnumerable<Patient>> Get()
+        public async Task<IActionResult> Get()
         {
-            var result = await _patientsRepository.GetAllAsync();
+            try
+            {
+                var result = await _patientsRepository.GetAllAsync();
 
-            return result;
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         // GET api/<PatientsController>/5
         [HttpGet("{id}")]
-        public async Task<Patient> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var result = await _patientsRepository.GetByIdAsync(id);
+            if (id <= 0) return BadRequest();
 
-            return result;
+            try
+            {
+                var foundEntry = await _patientsRepository.GetByIdAsync(id);
+
+                if (foundEntry == null) return NotFound();
+
+                return Ok(foundEntry);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         // POST api/<PatientsController>
         [HttpPost]
-        public async void Post(Patient patient)
+        public async Task<IActionResult> Post(Patient patient)
         {
-            await _patientsRepository.CreateAsync(patient);
+            try
+            {
+                await _patientsRepository.CreateAsync(patient);
+                return CreatedAtAction(nameof(Get), new { id = patient.Id }, patient);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         // PUT api/<PatientsController>/5
         [HttpPut("{id}")]
-        public async void Put(int id, Patient patient)
+        public async Task<IActionResult> Put(int id, Patient patient)
         {
-            await _patientsRepository.UpdateAsync(id, patient);
+            if (id != patient.Id) return BadRequest();
+
+            try
+            {
+                var foundEntry = await _patientsRepository.GetByIdAsync(id);
+
+                if (foundEntry == null) return NotFound();
+
+                await _patientsRepository.UpdateAsync(id, patient);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         // DELETE api/<PatientsController>/5
         [HttpDelete("{id}")]
-        public async void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            await _patientsRepository.DeleteAsync(id);
+            try
+            {
+                var foundEntry = await _patientsRepository.GetByIdAsync(id);
+
+                if(foundEntry == null) return NotFound();
+
+                await _patientsRepository.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

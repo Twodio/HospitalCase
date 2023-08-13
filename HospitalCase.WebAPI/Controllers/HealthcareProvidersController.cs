@@ -1,8 +1,10 @@
 ﻿using HospitalCase.WebAPI.Interfaces;
 using HospitalCase.WebAPI.Models;
 using HospitalCase.WebAPI.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -25,41 +27,99 @@ namespace HospitalCase.WebAPI.Controllers
 
         // GET: api/<HealthcareProvidersControllers>
         [HttpGet]
-        public async Task<IEnumerable<HealthcareProvider>> Get()
+        public async Task<IActionResult> Get()
         {
-            var result = await _healthcareProvidersRepository.GetAllAsync();
-
-            return result;
+            try
+            {
+                var result = await _healthcareProvidersRepository.GetAllAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         // GET api/<HealthcareProvidersControllers>/5
         [HttpGet("{id}")]
-        public async Task<HealthcareProvider> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var foundEntry = await _healthcareProvidersRepository.GetByIdAsync(id);
+            if (id <= 0) return BadRequest();
 
-            return foundEntry;
+            try
+            {
+                var foundEntry = await _healthcareProvidersRepository.GetByIdAsync(id);
+
+                if (foundEntry == null) return NotFound();
+
+                return Ok(foundEntry);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         // POST api/<HealthcareProvidersControllers>
         [HttpPost]
-        public async void Post([FromBody] HealthcareProvider healthcareProvider)
+        public async Task<IActionResult> Post([FromBody] HealthcareProvider healthcareProvider)
         {
-            await _healthcareProvidersRepository.CreateAsync(healthcareProvider);
+            try
+            {
+                await _healthcareProvidersRepository.CreateAsync(healthcareProvider);
+                return CreatedAtAction(nameof(Get), new { id = healthcareProvider.Id }, healthcareProvider);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         // PUT api/<HealthcareProvidersControllers>/5
         [HttpPut("{id}")]
-        public async void Put(int id, [FromBody] HealthcareProvider healthcareProvider)
+        public async Task<IActionResult> Put(int id, [FromBody] HealthcareProvider healthcareProvider)
         {
-            await _healthcareProvidersRepository.UpdateAsync(id, healthcareProvider);
+            if (id != healthcareProvider.Id) return BadRequest();
+
+            try
+            {
+                var foundEntry = await _healthcareProvidersRepository.GetByIdAsync(id);
+
+                if (foundEntry == null) return NotFound();
+
+                await _healthcareProvidersRepository.UpdateAsync(id, healthcareProvider);
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         // DELETE api/<HealthcareProvidersControllers>/5
         [HttpDelete("{id}")]
-        public async void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            await _healthcareProvidersRepository.DeleteAsync(id);
+            try
+            {
+                var foundEntry = await _healthcareProvidersRepository.GetByIdAsync(id);
+
+                if (foundEntry == null) return NotFound();
+
+                await _healthcareProvidersRepository.DeleteAsync(id);
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }
