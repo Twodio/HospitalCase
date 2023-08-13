@@ -1,8 +1,12 @@
+using HospitalCase.WebAPI.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HospitalCase.WebAPI
 {
@@ -18,6 +22,58 @@ namespace HospitalCase.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var healthcareproviders = new HashSet<HealthcareProvider>()
+            {
+                new HealthcareProvider()
+                {
+                    Id = 1,
+                    FirstName = "Jon",
+                    LastName = "Doe",
+                    Type = HealthcareProviderType.Doctor
+                },
+                new HealthcareProvider()
+                {
+                    Id = 2,
+                    FirstName = "Jane",
+                    LastName = "Smith",
+                    Type = HealthcareProviderType.Doctor
+                }
+            };
+
+            var patients = new HashSet<Patient>()
+            {
+                new Patient()
+                {
+                    Id = 3,
+                    FirstName = "Adam",
+                    LastName = "Willock"
+                }
+            };
+
+            var medicalRecords = new HashSet<MedicalRecord>()
+            {
+                new MedicalRecord()
+                {
+                    Id = 1,
+                    Patient = patients.Single(p => p.Id == 3),
+                    HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 1),
+                    RecordDate = new DateTime(2023, 08, 13),
+                    Diagnosis = "Flu"
+                },
+                new MedicalRecord()
+                {
+                    Id = 2,
+                    Patient = patients.Single(p => p.Id == 3),
+                    HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 2),
+                    RecordDate = new DateTime(2020, 08, 13),
+                    Diagnosis = "Covid-19"
+                }
+            };
+
+            services.AddSingleton<ICollection<HealthcareProvider>>(healthcareproviders);
+            services.AddSingleton<ICollection<Patient>>(patients);
+            services.AddSingleton<ICollection<MedicalRecord>>(medicalRecords);
+
             services.AddControllers();
         }
 
