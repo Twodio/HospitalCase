@@ -1,9 +1,11 @@
 ﻿using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Services;
 using HospitalCase.Domain.Models;
+using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
 using HospitalCase.WebAPI.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -16,11 +18,76 @@ namespace HospitalCase.Tests.Controllers
 {
     public class MedicalRecordsControllerTests
     {
+        private readonly HospitalCaseDbContextFactory _contextFactory;
+
+        public MedicalRecordsControllerTests()
+        {
+            // Configure the context to use In-Memory
+            _contextFactory = new HospitalCaseDbContextFactory(o => o.UseInMemoryDatabase("TestHospitalCaseDB"));
+
+            // Seed Initial Data
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var healthcareproviders = new HashSet<HealthcareProvider>()
+                {
+                    new HealthcareProvider()
+                    {
+                        Id = 1,
+                        FirstName = "Jon",
+                        LastName = "Doe",
+                        Type = HealthcareProviderType.Doctor
+                    },
+                    new HealthcareProvider()
+                    {
+                        Id = 2,
+                        FirstName = "Jane",
+                        LastName = "Smith",
+                        Type = HealthcareProviderType.Doctor
+                    }
+                };
+
+                var patients = new HashSet<Patient>()
+                {
+                    new Patient()
+                    {
+                        Id = 3,
+                        FirstName = "Adam",
+                        LastName = "Willock"
+                    }
+                };
+
+                var medicalRecords = new HashSet<MedicalRecord>()
+                {
+                    new MedicalRecord()
+                    {
+                        Id = 1,
+                        Patient = patients.Single(p => p.Id == 3),
+                        HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 1),
+                        RecordDate = new DateTime(2023, 08, 13),
+                        Diagnosis = "Flu"
+                    },
+                    new MedicalRecord()
+                    {
+                        Id = 2,
+                        Patient = patients.Single(p => p.Id == 3),
+                        HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 2),
+                        RecordDate = new DateTime(2020, 08, 13),
+                        Diagnosis = "Covid-19"
+                    }
+                };
+
+                context.People.AddRange(healthcareproviders);
+                context.People.AddRange(patients);
+                context.MedicalRecords.AddRange(medicalRecords);
+
+                context.SaveChanges();
+            }
+        }
+
         [Fact]
         public async Task GetAll_ReturnsOkResult_WithMedicalRecords()
         {
-            var people = await GetTestMedicalRecords();
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<MedicalRecordsController>>();
 
             IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
@@ -37,8 +104,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task GetById_WithValidId_ReturnsOkResult_WithOneMedicalRecord()
         {
-            var people = await GetTestMedicalRecords();
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<MedicalRecordsController>>();
 
             IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
@@ -55,8 +121,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task GetById_WithInvalidId_ReturnsBadRequest()
         {
-            var people = await GetTestMedicalRecords();
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<MedicalRecordsController>>();
 
             IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
@@ -71,8 +136,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task GetById_WithNonExistentId_ReturnsNotFoundResult()
         {
-            var people = await GetTestMedicalRecords();
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<MedicalRecordsController>>();
 
             IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
@@ -87,8 +151,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Post_ReturnsCreatedAtAction()
         {
-            var people = await GetTestMedicalRecords();
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<MedicalRecordsController>>();
 
             IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
@@ -97,20 +160,8 @@ namespace HospitalCase.Tests.Controllers
 
             var newEntry = new MedicalRecord()
             {
-                Id = 3,
-                Patient = new Patient()
-                {
-                    Id = 3,
-                    FirstName = "Adam",
-                    LastName = "Willock"
-                },
-                HealthcareProvider = new HealthcareProvider()
-                {
-                    Id = 1,
-                    FirstName = "Jon",
-                    LastName = "Doe",
-                    Type = HealthcareProviderType.Doctor
-                },
+                PatientId = 3,
+                HealthcareProviderId = 1,
                 RecordDate = new DateTime(2023, 08, 13),
                 Diagnosis = "Flu"
             };
@@ -125,8 +176,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Put_MissmatchedId_ReturnsBadRequest()
         {
-            var people = await GetTestMedicalRecords();
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<MedicalRecordsController>>();
 
             IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
@@ -136,19 +186,8 @@ namespace HospitalCase.Tests.Controllers
             var newEntry = new MedicalRecord()
             {
                 Id = 3,
-                Patient = new Patient()
-                {
-                    Id = 3,
-                    FirstName = "Adam",
-                    LastName = "Willock"
-                },
-                HealthcareProvider = new HealthcareProvider()
-                {
-                    Id = 1,
-                    FirstName = "Jon",
-                    LastName = "Doe",
-                    Type = HealthcareProviderType.Doctor
-                },
+                PatientId = 3,
+                HealthcareProviderId = 1,
                 RecordDate = new DateTime(2023, 08, 13),
                 Diagnosis = "Flu"
             };
@@ -161,8 +200,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Put_NonExistent_ReturnsNotFound()
         {
-            var people = await GetTestMedicalRecords();
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<MedicalRecordsController>>();
 
             IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
@@ -172,19 +210,8 @@ namespace HospitalCase.Tests.Controllers
             var newEntry = new MedicalRecord()
             {
                 Id = 3,
-                Patient = new Patient()
-                {
-                    Id = 3,
-                    FirstName = "Adam",
-                    LastName = "Willock"
-                },
-                HealthcareProvider = new HealthcareProvider()
-                {
-                    Id = 1,
-                    FirstName = "Jon",
-                    LastName = "Doe",
-                    Type = HealthcareProviderType.Doctor
-                },
+                PatientId = 3,
+                HealthcareProviderId = 1,
                 RecordDate = new DateTime(2023, 08, 13),
                 Diagnosis = "Flu"
             };
@@ -197,8 +224,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Put_UpdatesOneAndReturnsNoContent()
         {
-            var people = await GetTestMedicalRecords();
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<MedicalRecordsController>>();
 
             IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
@@ -208,19 +234,8 @@ namespace HospitalCase.Tests.Controllers
             var newEntry = new MedicalRecord()
             {
                 Id = 1,
-                Patient = new Patient()
-                {
-                    Id = 3,
-                    FirstName = "Adam",
-                    LastName = "Willock"
-                },
-                HealthcareProvider = new HealthcareProvider()
-                {
-                    Id = 1,
-                    FirstName = "Jon",
-                    LastName = "Doe",
-                    Type = HealthcareProviderType.Doctor
-                },
+                PatientId = 3,
+                HealthcareProviderId = 1,
                 RecordDate = new DateTime(2023, 08, 13),
                 Diagnosis = "Flu"
             };
@@ -233,8 +248,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Delete_NonExistent_ReturnsNotFound()
         {
-            var people = await GetTestMedicalRecords();
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<MedicalRecordsController>>();
 
             IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
@@ -249,8 +263,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Delete_DeletesOneAndReturnsNoContent()
         {
-            var people = await GetTestMedicalRecords();
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<MedicalRecordsController>>();
 
             IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
@@ -260,59 +273,6 @@ namespace HospitalCase.Tests.Controllers
             var result = await controller.Delete(1);
 
             Assert.IsType<NoContentResult>(result);
-        }
-
-        private Task<IEnumerable<MedicalRecord>> GetTestMedicalRecords()
-        {
-            var healthcareproviders = new HashSet<HealthcareProvider>()
-            {
-                new HealthcareProvider()
-                {
-                    Id = 1,
-                    FirstName = "Jon",
-                    LastName = "Doe",
-                    Type = HealthcareProviderType.Doctor
-                },
-                new HealthcareProvider()
-                {
-                    Id = 2,
-                    FirstName = "Jane",
-                    LastName = "Smith",
-                    Type = HealthcareProviderType.Doctor
-                }
-            };
-
-            var patients = new HashSet<Patient>()
-            {
-                new Patient()
-                {
-                    Id = 3,
-                    FirstName = "Adam",
-                    LastName = "Willock"
-                }
-            };
-
-            var medicalRecords = new HashSet<MedicalRecord>()
-            {
-                new MedicalRecord()
-                {
-                    Id = 1,
-                    Patient = patients.Single(p => p.Id == 3),
-                    HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 1),
-                    RecordDate = new DateTime(2023, 08, 13),
-                    Diagnosis = "Flu"
-                },
-                new MedicalRecord()
-                {
-                    Id = 2,
-                    Patient = patients.Single(p => p.Id == 3),
-                    HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 2),
-                    RecordDate = new DateTime(2020, 08, 13),
-                    Diagnosis = "Covid-19"
-                }
-            };
-
-            return Task.FromResult<IEnumerable<MedicalRecord>>(medicalRecords);
         }
     }
 }

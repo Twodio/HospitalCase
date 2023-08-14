@@ -1,6 +1,7 @@
 ﻿using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Services;
 using HospitalCase.Domain.Models;
+using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
 using HospitalCase.WebAPI.Controllers;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,8 @@ namespace HospitalCase.Tests.Controllers
         public async Task GetAll_ReturnsOkResult_WithPatients()
         {
             var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            var mockContext = new Mock<HospitalCaseDbContextFactory>();
+            IPatientRepository mockRepository = new PatientRepository(mockContext.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             IPatientService mockService = new PatientService(mockRepository);
@@ -37,7 +39,8 @@ namespace HospitalCase.Tests.Controllers
         public async Task GetById_WithValidId_ReturnsOkResult_WithOnePatient()
         {
             var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            var mockContext = new Mock<HospitalCaseDbContextFactory>();
+            IPatientRepository mockRepository = new PatientRepository(mockContext.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             IPatientService mockService = new PatientService(mockRepository);
@@ -55,7 +58,8 @@ namespace HospitalCase.Tests.Controllers
         public async Task GetById_WithInvalidId_ReturnsBadRequest()
         {
             var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            var mockContext = new Mock<HospitalCaseDbContextFactory>();
+            IPatientRepository mockRepository = new PatientRepository(mockContext.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             IPatientService mockService = new PatientService(mockRepository);
@@ -71,7 +75,8 @@ namespace HospitalCase.Tests.Controllers
         public async Task GetById_WithNonExistentId_ReturnsNotFoundResult()
         {
             var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            var mockContext = new Mock<HospitalCaseDbContextFactory>();
+            IPatientRepository mockRepository = new PatientRepository(mockContext.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             IPatientService mockService = new PatientService(mockRepository);
@@ -87,7 +92,8 @@ namespace HospitalCase.Tests.Controllers
         public async Task Post_ReturnsCreatedAtAction()
         {
             var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            var mockContext = new Mock<HospitalCaseDbContextFactory>();
+            IPatientRepository mockRepository = new PatientRepository(mockContext.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             IPatientService mockService = new PatientService(mockRepository);
@@ -112,7 +118,8 @@ namespace HospitalCase.Tests.Controllers
         public async Task Put_MissmatchedId_ReturnsBadRequest()
         {
             var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            var mockContext = new Mock<HospitalCaseDbContextFactory>();
+            IPatientRepository mockRepository = new PatientRepository(mockContext.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             IPatientService mockService = new PatientService(mockRepository);
@@ -135,7 +142,8 @@ namespace HospitalCase.Tests.Controllers
         public async Task Put_NonExistent_ReturnsNotFound()
         {
             var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            var mockContext = new Mock<HospitalCaseDbContextFactory>();
+            IPatientRepository mockRepository = new PatientRepository(mockContext.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             IPatientService mockService = new PatientService(mockRepository);
@@ -158,7 +166,8 @@ namespace HospitalCase.Tests.Controllers
         public async Task Put_UpdatesOneAndReturnsNoContent()
         {
             var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            var mockContext = new Mock<HospitalCaseDbContextFactory>();
+            IPatientRepository mockRepository = new PatientRepository(mockContext.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             IPatientService mockService = new PatientService(mockRepository);
@@ -181,7 +190,8 @@ namespace HospitalCase.Tests.Controllers
         public async Task Delete_NonExistent_ReturnsNotFound()
         {
             var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            var mockContext = new Mock<HospitalCaseDbContextFactory>();
+            IPatientRepository mockRepository = new PatientRepository(mockContext.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             IPatientService mockService = new PatientService(mockRepository);
@@ -197,7 +207,8 @@ namespace HospitalCase.Tests.Controllers
         public async Task Delete_DeletesOneAndReturnsNoContent()
         {
             var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            var mockContext = new Mock<HospitalCaseDbContextFactory>();
+            IPatientRepository mockRepository = new PatientRepository(mockContext.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             IPatientService mockService = new PatientService(mockRepository);

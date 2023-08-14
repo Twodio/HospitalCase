@@ -6,7 +6,7 @@ namespace HospitalCase.Insfrastructure.Repositories
 {
     public class PatientRepository : PersonRepository<Patient>, IPatientRepository
     {
-        public PatientRepository(ICollection<Patient> people) : base(people)
+        public PatientRepository(HospitalCaseDbContextFactory dbContextFactory) : base(dbContextFactory)
         {
         }
     }

@@ -1,6 +1,9 @@
 ﻿using HospitalCase.Application.Interfaces;
 using HospitalCase.Domain.Models;
+using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +14,41 @@ namespace HospitalCase.Tests.Repositories
 {
     public class HealthcareProviderRepositoryTests
     {
-        [Fact]
-        public async Task GetAll_ReturnsAll_HealthcareProviders_Works()
+        private readonly HospitalCaseDbContextFactory _contextFactory;
+
+        public HealthcareProviderRepositoryTests()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            // Configure the context to use In-Memory
+            _contextFactory = new HospitalCaseDbContextFactory(o => o.UseInMemoryDatabase("TestHospitalCaseDB"));
+
+            // Seed Initial Data
+            using(var context = _contextFactory.CreateDbContext())
+            {
+                var healthcareproviders = new HashSet<HealthcareProvider>()
+                {
+                    new HealthcareProvider()
+                    {
+                        FirstName = "Jon",
+                        LastName = "Doe",
+                        Type = HealthcareProviderType.Doctor
+                    },
+                    new HealthcareProvider()
+                    {
+                        FirstName = "Jane",
+                        LastName = "Smith",
+                        Type = HealthcareProviderType.Doctor
+                    }
+                };
+
+                context.People.AddRange(healthcareproviders);
+                context.SaveChanges();
+            }
+        }
+
+        [Fact]
+        public async Task GetAll_ReturnsAll_HealthcareProviders()
+        {
+            var mockRepository = new HealthcareProviderRepository(_contextFactory);
 
             var results = await mockRepository.GetAllAsync();
 
@@ -23,41 +56,41 @@ namespace HospitalCase.Tests.Repositories
         }
 
         [Fact]
-        public async Task GetById_ReturnsOne_HealthcareProvider_Works()
+        public async Task GetById_ReturnsOne_HealthcareProvider()
         {
+            var entry = new HealthcareProvider()
+            {
+                Id = 1,
+                FirstName = "Jon",
+                LastName = "Doe",
+                Type = HealthcareProviderType.Doctor
+            };
+
             var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            var mockRepository = new HealthcareProviderRepository(_contextFactory);
 
-            var id = 1;
-            var firstName = "Jon";
-            var lastName = "Doe";
-            var type = HealthcareProviderType.Doctor;
-
-            var result = await mockRepository.GetByIdAsync(id);
+            var result = await mockRepository.GetByIdAsync(entry.Id);
 
             Assert.NotNull(result);
-            Assert.NotNull(result);
-            Assert.Equal(id, result.Id);
-            Assert.Equal(firstName, result.FirstName);
-            Assert.Equal(lastName, result.LastName);
-            Assert.Equal(type, result.Type);
+            Assert.Equal(entry.Id, result.Id);
+            Assert.Equal(entry.FirstName, result.FirstName);
+            Assert.Equal(entry.LastName, result.LastName);
+            Assert.Equal(entry.Type, result.Type);
         }
 
         [Fact]
-        public async Task Create_AddsOne_HealthcareProvider_Works()
+        public async Task Create_AddsOne_HealthcareProvider()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
-
             var newEntry = new HealthcareProvider()
             {
-                Id = 4,
                 FirstName = "New",
                 LastName = "Entry",
                 BirthDate = new DateTime(1994, 08, 18),
                 PhoneNumber = "1234567890",
                 Type = HealthcareProviderType.Doctor
             };
+
+            var mockRepository = new HealthcareProviderRepository(_contextFactory);
 
             var result = await mockRepository.CreateAsync(newEntry);
 
@@ -68,10 +101,9 @@ namespace HospitalCase.Tests.Repositories
         }
 
         [Fact]
-        public async Task Delete_RemovesOne_HealthcareProvider_Works()
+        public async Task Delete_RemovesOne_HealthcareProvider()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            var mockRepository = new HealthcareProviderRepository(_contextFactory);
 
             var result = await mockRepository.DeleteAsync(1);
 
@@ -82,25 +114,22 @@ namespace HospitalCase.Tests.Repositories
         }
 
         [Fact]
-        public async Task Update_ChangesOne_HealthcareProvider_Works()
+        public async Task Update_ChangesOne_HealthcareProvider()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            var entry = new HealthcareProvider()
+            {
+                Id = 1,
+                FirstName = "Changed",
+                LastName = "Doe",
+                Type = HealthcareProviderType.Doctor
+            };
 
-            var id = 1;
+            var mockRepository = new HealthcareProviderRepository(_contextFactory);
 
-            var foundHealthcareProvider = await mockRepository.GetByIdAsync(id);
-
-            var updatedFirstName = "changed";
-
-            foundHealthcareProvider.FirstName = updatedFirstName;
-
-            var result = await mockRepository.UpdateAsync(id, foundHealthcareProvider);
-
-            var updatedHealthcareProvider = await mockRepository.GetByIdAsync(id);
+            var result = await mockRepository.UpdateAsync(entry.Id, entry);
 
             Assert.NotNull(result);
-            Assert.Equal(updatedFirstName, updatedHealthcareProvider.FirstName);
+            Assert.Equal(entry.FirstName, result.FirstName);
         }
 
         private Task<IEnumerable<HealthcareProvider>> GetTestHealthcareProviders()

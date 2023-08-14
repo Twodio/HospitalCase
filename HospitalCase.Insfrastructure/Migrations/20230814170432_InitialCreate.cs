@@ -33,13 +33,14 @@ namespace HospitalCase.Insfrastructure.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PatientId = table.Column<int>(nullable: true),
-                    HealthcareProviderId = table.Column<int>(nullable: true),
+                    PatientId = table.Column<int>(nullable: false),
+                    HealthcareProviderId = table.Column<int>(nullable: false),
                     RecordDate = table.Column<DateTime>(nullable: false),
                     Diagnosis = table.Column<string>(nullable: true),
                     Symptoms = table.Column<string>(nullable: true),
                     Treatment = table.Column<string>(nullable: true),
-                    Notes = table.Column<string>(nullable: true)
+                    Notes = table.Column<string>(nullable: true),
+                    PatientId1 = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -49,10 +50,15 @@ namespace HospitalCase.Insfrastructure.Migrations
                         column: x => x.HealthcareProviderId,
                         principalTable: "People",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_MedicalRecords_People_PatientId",
                         column: x => x.PatientId,
+                        principalTable: "People",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_MedicalRecords_People_PatientId1",
+                        column: x => x.PatientId1,
                         principalTable: "People",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -67,6 +73,11 @@ namespace HospitalCase.Insfrastructure.Migrations
                 name: "IX_MedicalRecords_PatientId",
                 table: "MedicalRecords",
                 column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MedicalRecords_PatientId1",
+                table: "MedicalRecords",
+                column: "PatientId1");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

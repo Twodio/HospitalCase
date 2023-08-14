@@ -14,6 +14,18 @@ namespace HospitalCase.Insfrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Mappings for the medical records
+            modelBuilder.Entity<MedicalRecord>()
+                .HasOne(mr => mr.Patient)
+                .WithMany()
+                .HasForeignKey(mr => mr.PatientId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MedicalRecord>()
+                .HasOne(mr => mr.HealthcareProvider)
+                .WithMany()
+                .HasForeignKey(mr => mr.HealthcareProviderId);
+
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -29,13 +29,16 @@ namespace HospitalCase.Insfrastructure.Migrations
                     b.Property<string>("Diagnosis")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("HealthcareProviderId")
+                    b.Property<int>("HealthcareProviderId")
                         .HasColumnType("int");
 
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PatientId")
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PatientId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("RecordDate")
@@ -52,6 +55,8 @@ namespace HospitalCase.Insfrastructure.Migrations
                     b.HasIndex("HealthcareProviderId");
 
                     b.HasIndex("PatientId");
+
+                    b.HasIndex("PatientId1");
 
                     b.ToTable("MedicalRecords");
                 });
@@ -113,11 +118,19 @@ namespace HospitalCase.Insfrastructure.Migrations
                 {
                     b.HasOne("HospitalCase.Domain.Models.HealthcareProvider", "HealthcareProvider")
                         .WithMany()
-                        .HasForeignKey("HealthcareProviderId");
+                        .HasForeignKey("HealthcareProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HospitalCase.Domain.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("HospitalCase.Domain.Models.Patient", null)
                         .WithMany("MedicalRecords")
-                        .HasForeignKey("PatientId");
+                        .HasForeignKey("PatientId1");
                 });
 #pragma warning restore 612, 618
         }

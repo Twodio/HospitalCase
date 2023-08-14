@@ -1,9 +1,11 @@
 ﻿using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Services;
 using HospitalCase.Domain.Models;
+using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
 using HospitalCase.WebAPI.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Collections.Generic;
@@ -15,11 +17,41 @@ namespace HospitalCase.Tests.Controllers
 {
     public class HealthcareProvidersControllerTests
     {
+        private readonly HospitalCaseDbContextFactory _contextFactory;
+
+        public HealthcareProvidersControllerTests()
+        {
+            // Configure the context to use In-Memory
+            _contextFactory = new HospitalCaseDbContextFactory(o => o.UseInMemoryDatabase("TestHospitalCaseDB"));
+
+            // Seed Initial Data
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var healthcareproviders = new HashSet<HealthcareProvider>()
+                {
+                    new HealthcareProvider()
+                    {
+                        FirstName = "Jon",
+                        LastName = "Doe",
+                        Type = HealthcareProviderType.Doctor
+                    },
+                    new HealthcareProvider()
+                    {
+                        FirstName = "Jane",
+                        LastName = "Smith",
+                        Type = HealthcareProviderType.Doctor
+                    }
+                };
+
+                context.People.AddRange(healthcareproviders);
+                context.SaveChanges();
+            }
+        }
+
         [Fact]
         public async Task GetAll_ReturnsOkResult_WithHealthcareProviders()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -36,8 +68,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task GetById_WithValidId_ReturnsOkResult_WithOneHealthcareProvider()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -54,8 +85,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task GetById__WithInvalidId_ReturnsBadRequest()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -70,8 +100,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task GetById_WithNonExistentId_ReturnsNotFoundResult()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -86,8 +115,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Post_ReturnsCreatedAtAction()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -112,8 +140,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Put_MissmatchedId_ReturnsBadRequest()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -136,8 +163,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Put_NonExistent_ReturnsNotFound()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -160,8 +186,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Put_UpdatesOneAndReturnsNoContent()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -184,8 +209,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Delete_NonExistent_ReturnsNotFound()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -200,8 +224,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Delete_DeletesOneAndReturnsNoContent()
         {
-            var people = await GetTestHealthcareProviders();
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -211,29 +234,6 @@ namespace HospitalCase.Tests.Controllers
             var result = await controller.Delete(2);
 
             Assert.IsType<NoContentResult>(result);
-        }
-
-        private Task<IEnumerable<HealthcareProvider>> GetTestHealthcareProviders()
-        {
-            var healthcareproviders = new HashSet<HealthcareProvider>()
-            {
-                new HealthcareProvider()
-                {
-                    Id = 1,
-                    FirstName = "Jon",
-                    LastName = "Doe",
-                    Type = HealthcareProviderType.Doctor
-                },
-                new HealthcareProvider()
-                {
-                    Id = 2,
-                    FirstName = "Jane",
-                    LastName = "Smith",
-                    Type = HealthcareProviderType.Doctor
-                }
-            };
-
-            return Task.FromResult<IEnumerable<HealthcareProvider>>(healthcareproviders);
         }
     }
 }

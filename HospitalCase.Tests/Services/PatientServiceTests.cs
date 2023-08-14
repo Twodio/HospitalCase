@@ -1,7 +1,10 @@
 ﻿using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Services;
 using HospitalCase.Domain.Models;
+using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +15,41 @@ namespace HospitalCase.Tests.Services
 {
     public class PatientServiceTests
     {
+        private readonly HospitalCaseDbContextFactory _contextFactory;
+
+        public PatientServiceTests()
+        {
+            // Configure the context to use In-Memory
+            _contextFactory = new HospitalCaseDbContextFactory(o => o.UseInMemoryDatabase("TestHospitalCaseDB"));
+
+            // Seed Initial Data
+            using (var context = _contextFactory.CreateDbContext())
+            {
+                var patients = new HashSet<Patient>()
+                {
+                    new Patient()
+                    {
+                        Id = 3,
+                        FirstName = "Adam",
+                        LastName = "Willock"
+                    },
+                    new Patient()
+                    {
+                        Id = 4,
+                        FirstName = "Mariah",
+                        LastName = "Leaft"
+                    }
+                };
+
+                context.People.AddRange(patients);
+                context.SaveChanges();
+            }
+        }
+
         [Fact]
         public async Task GetAll_ReturnsAll_Patients()
         {
-            var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
 
             IPatientService mockService = new PatientService(mockRepository);
 
@@ -29,8 +62,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task GetById_ReturnsOne_Patient()
         {
-            var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
 
             IPatientService mockService = new PatientService(mockRepository);
 
@@ -49,8 +81,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task Create_AddsOne_Patient()
         {
-            var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
 
             IPatientService mockService = new PatientService(mockRepository);
 
@@ -74,8 +105,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task Delete_RemovesOne_Patient()
         {
-            var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
 
             IPatientService mockService = new PatientService(mockRepository);
 
@@ -90,8 +120,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task Update_ChangesOne_Patient()
         {
-            var people = await GetTestPatients();
-            IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
+            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
 
             IPatientService mockService = new PatientService(mockRepository);
 
@@ -109,27 +138,6 @@ namespace HospitalCase.Tests.Services
 
             Assert.NotNull(result);
             Assert.Equal(updatedFirstName, updatedPatient.FirstName);
-        }
-
-        private Task<IEnumerable<Patient>> GetTestPatients()
-        {
-            var patients = new HashSet<Patient>()
-            {
-                new Patient()
-                {
-                    Id = 3,
-                    FirstName = "Adam",
-                    LastName = "Willock"
-                },
-                new Patient()
-                {
-                    Id = 4,
-                    FirstName = "Mariah",
-                    LastName = "Leaft"
-                }
-            };
-
-            return Task.FromResult<IEnumerable<Patient>>(patients);
         }
     }
 }

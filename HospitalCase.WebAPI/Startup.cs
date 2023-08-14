@@ -82,16 +82,15 @@ namespace HospitalCase.WebAPI
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
 
             Action<DbContextOptionsBuilder> optionsBuilder = (options) => options.UseSqlServer(connectionString);
-            HospitalCaseDbContextFactory dbContextFactory = new HospitalCaseDbContextFactory(optionsBuilder);
 
             // Register Entity Framework
-            services.AddSingleton<HospitalCaseDbContextFactory>(dbContextFactory);
+            services.AddSingleton<HospitalCaseDbContextFactory>(new HospitalCaseDbContextFactory(optionsBuilder));
             services.AddDbContext<HospitalCaseDbContext>(optionsBuilder);
 
             // Register repositories
-            services.AddSingleton<IHealthcareProviderRepository>(new HealthcareProviderRepository(healthcareproviders));
-            services.AddSingleton<IPatientRepository>(new PatientRepository(patients));
-            services.AddSingleton<IMedicalRecordRepository>(new MedicalRecordRepository(medicalRecords));
+            services.AddSingleton<IHealthcareProviderRepository>(s => new HealthcareProviderRepository(s.GetRequiredService<HospitalCaseDbContextFactory>()));
+            services.AddSingleton<IPatientRepository>(s => new PatientRepository(s.GetRequiredService<HospitalCaseDbContextFactory>()));
+            services.AddSingleton<IMedicalRecordRepository>(s => new MedicalRecordRepository(s.GetRequiredService<HospitalCaseDbContextFactory>()));
 
             // Register domain services
             services.AddSingleton<IHealthcareProviderService>(s => new HealthcareProviderService(s.GetRequiredService<IHealthcareProviderRepository>()));
