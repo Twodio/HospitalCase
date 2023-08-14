@@ -14,76 +14,77 @@ namespace HospitalCase.Tests.Repositories
 {
     public class MedicalRecordRepositoryTests
     {
-        private readonly HospitalCaseDbContextFactory _contextFactory;
+        private readonly HospitalCaseDbContext _context;
 
         public MedicalRecordRepositoryTests()
         {
             // Configure the context to use In-Memory
-            _contextFactory = new HospitalCaseDbContextFactory(o => o.UseInMemoryDatabase("TestHospitalCaseDB"));
+            var options = new DbContextOptionsBuilder<HospitalCaseDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            _context = new HospitalCaseDbContext(options);
 
             // Seed Initial Data
-            using (var context = _contextFactory.CreateDbContext())
+            var healthcareproviders = new HashSet<HealthcareProvider>()
             {
-                var healthcareproviders = new HashSet<HealthcareProvider>()
+                new HealthcareProvider()
                 {
-                    new HealthcareProvider()
-                    {
-                        Id = 1,
-                        FirstName = "Jon",
-                        LastName = "Doe",
-                        Type = HealthcareProviderType.Doctor
-                    },
-                    new HealthcareProvider()
-                    {
-                        Id = 2,
-                        FirstName = "Jane",
-                        LastName = "Smith",
-                        Type = HealthcareProviderType.Doctor
-                    }
-                };
-
-                var patients = new HashSet<Patient>()
+                    Id = 1,
+                    FirstName = "Jon",
+                    LastName = "Doe",
+                    Type = HealthcareProviderType.Doctor
+                },
+                new HealthcareProvider()
                 {
-                    new Patient()
-                    {
-                        Id = 3,
-                        FirstName = "Adam",
-                        LastName = "Willock"
-                    }
-                };
+                    Id = 2,
+                    FirstName = "Jane",
+                    LastName = "Smith",
+                    Type = HealthcareProviderType.Doctor
+                }
+            };
 
-                var medicalRecords = new HashSet<MedicalRecord>()
+            var patients = new HashSet<Patient>()
+            {
+                new Patient()
                 {
-                    new MedicalRecord()
-                    {
-                        Id = 1,
-                        Patient = patients.Single(p => p.Id == 3),
-                        HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 1),
-                        RecordDate = new DateTime(2023, 08, 13),
-                        Diagnosis = "Flu"
-                    },
-                    new MedicalRecord()
-                    {
-                        Id = 2,
-                        Patient = patients.Single(p => p.Id == 3),
-                        HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 2),
-                        RecordDate = new DateTime(2020, 08, 13),
-                        Diagnosis = "Covid-19"
-                    }
-                };
+                    Id = 3,
+                    FirstName = "Adam",
+                    LastName = "Willock"
+                }
+            };
 
-                context.People.AddRange(healthcareproviders);
-                context.People.AddRange(patients);
-                context.MedicalRecords.AddRange(medicalRecords);
+            var medicalRecords = new HashSet<MedicalRecord>()
+            {
+                new MedicalRecord()
+                {
+                    Id = 1,
+                    Patient = patients.Single(p => p.Id == 3),
+                    HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 1),
+                    RecordDate = new DateTime(2023, 08, 13),
+                    Diagnosis = "Flu"
+                },
+                new MedicalRecord()
+                {
+                    Id = 2,
+                    Patient = patients.Single(p => p.Id == 3),
+                    HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 2),
+                    RecordDate = new DateTime(2020, 08, 13),
+                    Diagnosis = "Covid-19"
+                }
+            };
 
-                context.SaveChanges();
-            }
+            _context.People.AddRange(healthcareproviders);
+            _context.People.AddRange(patients);
+            _context.MedicalRecords.AddRange(medicalRecords);
+
+            _context.SaveChanges();
         }
 
         [Fact]
         public async Task GetAll_ReturnsAll_MedicalRecords_Works()
         {
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_context);
 
             var results = await mockRepository.GetAllAsync();
 
@@ -94,7 +95,7 @@ namespace HospitalCase.Tests.Repositories
         [Fact]
         public async Task GetById_ReturnsOne_MedicalRecord_Works()
         {
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_context);
 
             var id = 1;
 
@@ -107,7 +108,7 @@ namespace HospitalCase.Tests.Repositories
         [Fact]
         public async Task Create_AddsOne_MedicalRecord_Works()
         {
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_context);
 
             var newEntry = new MedicalRecord()
             {
@@ -128,7 +129,7 @@ namespace HospitalCase.Tests.Repositories
         [Fact]
         public async Task Delete_RemovesOne_MedicalRecord_Works()
         {
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_context);
 
             var result = await mockRepository.DeleteAsync(1);
 
@@ -141,7 +142,7 @@ namespace HospitalCase.Tests.Repositories
         [Fact]
         public async Task Update_ChangesOne_MedicalRecord_Works()
         {
-            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_contextFactory);
+            IMedicalRecordRepository mockRepository = new MedicalRecordRepository(_context);
 
             var id = 1;
 

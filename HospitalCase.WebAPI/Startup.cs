@@ -1,17 +1,23 @@
 using HospitalCase.Application.Interfaces;
+using HospitalCase.Application.Models;
 using HospitalCase.Application.Services;
 using HospitalCase.Domain.Models;
 using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace HospitalCase.WebAPI
 {
@@ -84,13 +90,39 @@ namespace HospitalCase.WebAPI
             Action<DbContextOptionsBuilder> optionsBuilder = (options) => options.UseSqlServer(connectionString);
 
             // Register Entity Framework
-            services.AddSingleton<HospitalCaseDbContextFactory>(new HospitalCaseDbContextFactory(optionsBuilder));
+            services.AddSingleton<HospitalCaseDbContextFactory>(new HospitalCaseDbContextFactory());
+            services.AddSingleton<IDesignTimeDbContextFactory<HospitalCaseDbContext>, HospitalCaseDbContextFactory>(s => s.GetRequiredService<HospitalCaseDbContextFactory>());
             services.AddDbContext<HospitalCaseDbContext>(optionsBuilder);
 
+            // Configure Identity
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<HospitalCaseDbContext>()
+                .AddDefaultTokenProviders();
+
+            // Configure JWT Authentication
+            var key = Encoding.ASCII.GetBytes(Configuration["Jwt:key"]);
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
             // Register repositories
-            services.AddSingleton<IHealthcareProviderRepository>(s => new HealthcareProviderRepository(s.GetRequiredService<HospitalCaseDbContextFactory>()));
-            services.AddSingleton<IPatientRepository>(s => new PatientRepository(s.GetRequiredService<HospitalCaseDbContextFactory>()));
-            services.AddSingleton<IMedicalRecordRepository>(s => new MedicalRecordRepository(s.GetRequiredService<HospitalCaseDbContextFactory>()));
+            services.AddSingleton<IHealthcareProviderRepository>(s => new HealthcareProviderRepository(s.GetRequiredService<HospitalCaseDbContext>()));
+            services.AddSingleton<IPatientRepository>(s => new PatientRepository(s.GetRequiredService<HospitalCaseDbContext>()));
+            services.AddSingleton<IMedicalRecordRepository>(s => new MedicalRecordRepository(s.GetRequiredService<HospitalCaseDbContext>()));
 
             // Register domain services
             services.AddSingleton<IHealthcareProviderService>(s => new HealthcareProviderService(s.GetRequiredService<IHealthcareProviderRepository>()));

@@ -15,17 +15,19 @@ namespace HospitalCase.Tests.Services
 {
     public  class HealthcareProviderServiceTests
     {
-        private readonly HospitalCaseDbContextFactory _contextFactory;
+        private readonly HospitalCaseDbContext _context;
 
         public HealthcareProviderServiceTests()
         {
             // Configure the context to use In-Memory
-            _contextFactory = new HospitalCaseDbContextFactory(o => o.UseInMemoryDatabase("TestHospitalCaseDB"));
+            var options = new DbContextOptionsBuilder<HospitalCaseDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            _context = new HospitalCaseDbContext(options);
 
             // Seed Initial Data
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                var healthcareproviders = new HashSet<HealthcareProvider>()
+            var healthcareproviders = new HashSet<HealthcareProvider>()
                 {
                     new HealthcareProvider()
                     {
@@ -41,15 +43,14 @@ namespace HospitalCase.Tests.Services
                     }
                 };
 
-                context.People.AddRange(healthcareproviders);
-                context.SaveChanges();
-            }
+            _context.People.AddRange(healthcareproviders);
+            _context.SaveChanges();
         }
 
         [Fact]
         public async Task GetAll_ReturnsAll_HealthcareProviders()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
 
@@ -61,7 +62,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task GetById_ReturnsOne_HealthcareProvider()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
 
@@ -83,7 +84,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task Create_AddsOne_HealthcareProvider()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
 
@@ -107,7 +108,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task Delete_RemovesOne_HealthcareProvider()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
 
@@ -122,7 +123,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task Update_ChangesOne_HealthcareProvider()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
 

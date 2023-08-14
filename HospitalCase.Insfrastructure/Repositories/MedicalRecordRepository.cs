@@ -10,7 +10,7 @@ namespace HospitalCase.Insfrastructure.Repositories
     public class MedicalRecordRepository : BaseRepository<MedicalRecord>, IMedicalRecordRepository
     {
 
-        public MedicalRecordRepository(HospitalCaseDbContextFactory dbContextFactory) : base(dbContextFactory)
+        public MedicalRecordRepository(HospitalCaseDbContext dbContext) : base(dbContext)
         {
         }
     }

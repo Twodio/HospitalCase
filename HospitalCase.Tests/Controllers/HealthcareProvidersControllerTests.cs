@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,41 +18,42 @@ namespace HospitalCase.Tests.Controllers
 {
     public class HealthcareProvidersControllerTests
     {
-        private readonly HospitalCaseDbContextFactory _contextFactory;
+        private readonly HospitalCaseDbContext _context;
 
         public HealthcareProvidersControllerTests()
         {
             // Configure the context to use In-Memory
-            _contextFactory = new HospitalCaseDbContextFactory(o => o.UseInMemoryDatabase("TestHospitalCaseDB"));
+            var options = new DbContextOptionsBuilder<HospitalCaseDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            _context = new HospitalCaseDbContext(options);
 
             // Seed Initial Data
-            using (var context = _contextFactory.CreateDbContext())
+            var healthcareproviders = new HashSet<HealthcareProvider>()
             {
-                var healthcareproviders = new HashSet<HealthcareProvider>()
+                new HealthcareProvider()
                 {
-                    new HealthcareProvider()
-                    {
-                        FirstName = "Jon",
-                        LastName = "Doe",
-                        Type = HealthcareProviderType.Doctor
-                    },
-                    new HealthcareProvider()
-                    {
-                        FirstName = "Jane",
-                        LastName = "Smith",
-                        Type = HealthcareProviderType.Doctor
-                    }
-                };
+                    FirstName = "Jon",
+                    LastName = "Doe",
+                    Type = HealthcareProviderType.Doctor
+                },
+                new HealthcareProvider()
+                {
+                    FirstName = "Jane",
+                    LastName = "Smith",
+                    Type = HealthcareProviderType.Doctor
+                }
+            };
 
-                context.People.AddRange(healthcareproviders);
-                context.SaveChanges();
-            }
+            _context.People.AddRange(healthcareproviders);
+            _context.SaveChanges();
         }
 
         [Fact]
         public async Task GetAll_ReturnsOkResult_WithHealthcareProviders()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -68,7 +70,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task GetById_WithValidId_ReturnsOkResult_WithOneHealthcareProvider()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -85,7 +87,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task GetById__WithInvalidId_ReturnsBadRequest()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -100,7 +102,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task GetById_WithNonExistentId_ReturnsNotFoundResult()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -115,7 +117,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Post_ReturnsCreatedAtAction()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -124,7 +126,6 @@ namespace HospitalCase.Tests.Controllers
 
             var newEntry = new HealthcareProvider()
             {
-                Id = 1,
                 FirstName = "Hellen",
                 LastName = "Carlton",
                 Type = HealthcareProviderType.Doctor
@@ -140,7 +141,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Put_MissmatchedId_ReturnsBadRequest()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -163,7 +164,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Put_NonExistent_ReturnsNotFound()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -186,7 +187,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Put_UpdatesOneAndReturnsNoContent()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -209,7 +210,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Delete_NonExistent_ReturnsNotFound()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
@@ -224,7 +225,7 @@ namespace HospitalCase.Tests.Controllers
         [Fact]
         public async Task Delete_DeletesOneAndReturnsNoContent()
         {
-            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_contextFactory);
+            IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
             IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);

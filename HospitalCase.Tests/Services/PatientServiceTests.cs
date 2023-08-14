@@ -15,41 +15,42 @@ namespace HospitalCase.Tests.Services
 {
     public class PatientServiceTests
     {
-        private readonly HospitalCaseDbContextFactory _contextFactory;
+        private readonly HospitalCaseDbContext _context;
 
         public PatientServiceTests()
         {
             // Configure the context to use In-Memory
-            _contextFactory = new HospitalCaseDbContextFactory(o => o.UseInMemoryDatabase("TestHospitalCaseDB"));
+            var options = new DbContextOptionsBuilder<HospitalCaseDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            _context = new HospitalCaseDbContext(options);
 
             // Seed Initial Data
-            using (var context = _contextFactory.CreateDbContext())
+            var patients = new HashSet<Patient>()
             {
-                var patients = new HashSet<Patient>()
+                new Patient()
                 {
-                    new Patient()
-                    {
-                        Id = 3,
-                        FirstName = "Adam",
-                        LastName = "Willock"
-                    },
-                    new Patient()
-                    {
-                        Id = 4,
-                        FirstName = "Mariah",
-                        LastName = "Leaft"
-                    }
-                };
+                    Id = 3,
+                    FirstName = "Adam",
+                    LastName = "Willock"
+                },
+                new Patient()
+                {
+                    Id = 4,
+                    FirstName = "Mariah",
+                    LastName = "Leaft"
+                }
+            };
 
-                context.People.AddRange(patients);
-                context.SaveChanges();
-            }
+            _context.People.AddRange(patients);
+            _context.SaveChanges();
         }
 
         [Fact]
         public async Task GetAll_ReturnsAll_Patients()
         {
-            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
+            IPatientRepository mockRepository = new PatientRepository(_context);
 
             IPatientService mockService = new PatientService(mockRepository);
 
@@ -62,7 +63,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task GetById_ReturnsOne_Patient()
         {
-            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
+            IPatientRepository mockRepository = new PatientRepository(_context);
 
             IPatientService mockService = new PatientService(mockRepository);
 
@@ -81,13 +82,12 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task Create_AddsOne_Patient()
         {
-            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
+            IPatientRepository mockRepository = new PatientRepository(_context);
 
             IPatientService mockService = new PatientService(mockRepository);
 
             var newEntry = new Patient()
             {
-                Id = 4,
                 FirstName = "New",
                 LastName = "Entry",
                 BirthDate = new DateTime(1994, 08, 18),
@@ -105,7 +105,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task Delete_RemovesOne_Patient()
         {
-            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
+            IPatientRepository mockRepository = new PatientRepository(_context);
 
             IPatientService mockService = new PatientService(mockRepository);
 
@@ -120,7 +120,7 @@ namespace HospitalCase.Tests.Services
         [Fact]
         public async Task Update_ChangesOne_Patient()
         {
-            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
+            IPatientRepository mockRepository = new PatientRepository(_context);
 
             IPatientService mockService = new PatientService(mockRepository);
 

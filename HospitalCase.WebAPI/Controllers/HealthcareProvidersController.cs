@@ -1,5 +1,6 @@
 ﻿using HospitalCase.Application.Interfaces;
 using HospitalCase.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ namespace HospitalCase.WebAPI.Controllers
     /// <summary>
     /// Manages operations related to the healthcare providers
     /// </summary>
+    [Authorize]
     [Route("api/healthcare-providers")]
     [ApiController]
     public class HealthcareProvidersController : ControllerBase

@@ -1,14 +1,16 @@
-﻿using HospitalCase.Domain.Models;
+﻿using HospitalCase.Application.Models;
+using HospitalCase.Domain.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HospitalCase.Insfrastructure
 {
-    public class HospitalCaseDbContext : DbContext
+    public class HospitalCaseDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Person> People { get; set; }
         public DbSet<MedicalRecord> MedicalRecords { get; set; }
 
-        public HospitalCaseDbContext(DbContextOptions options) : base(options)
+        public HospitalCaseDbContext(DbContextOptions<HospitalCaseDbContext> options) : base(options)
         {
         }
 

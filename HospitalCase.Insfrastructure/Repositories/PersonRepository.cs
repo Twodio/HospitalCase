@@ -8,7 +8,7 @@ namespace HospitalCase.Insfrastructure.Repositories
 {
     public class PersonRepository<TEntity> : BaseRepository<TEntity>, IPersonRepository<TEntity> where TEntity : Person, new()
     {
-        public PersonRepository(HospitalCaseDbContextFactory dbContextFactory) : base(dbContextFactory)
+        public PersonRepository(HospitalCaseDbContext dbContext) : base(dbContext)
         {
         }
     }

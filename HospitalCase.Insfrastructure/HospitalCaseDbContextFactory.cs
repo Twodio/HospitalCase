@@ -1,24 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 using System;
+using System.IO;
 
 namespace HospitalCase.Insfrastructure
 {
-    public class HospitalCaseDbContextFactory
+    public class HospitalCaseDbContextFactory : IDesignTimeDbContextFactory<HospitalCaseDbContext>
     {
-        private readonly Action<DbContextOptionsBuilder> _optionBuilder;
-
-        public HospitalCaseDbContextFactory(Action<DbContextOptionsBuilder> optionBuilder)
+        public HospitalCaseDbContext CreateDbContext(string[] args)
         {
-            _optionBuilder = optionBuilder;
-        }
+            IConfigurationBuilder builder = new ConfigurationBuilder();
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
 
-        public HospitalCaseDbContext CreateDbContext()
-        {
-            DbContextOptionsBuilder<HospitalCaseDbContext> options = new DbContextOptionsBuilder<HospitalCaseDbContext>();
+            DbContextOptionsBuilder<HospitalCaseDbContext> optionsBuilder = new DbContextOptionsBuilder<HospitalCaseDbContext>();
 
-            _optionBuilder(options);
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 
-            return new HospitalCaseDbContext(options.Options);
+            return new HospitalCaseDbContext(optionsBuilder.Options);
         }
     }
 }

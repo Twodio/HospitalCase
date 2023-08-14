@@ -8,66 +8,66 @@ namespace HospitalCase.Insfrastructure.Repositories
 {
     public abstract class BaseRepository<TEntity> : IBaseRepository<int, TEntity> where TEntity : DomainObject, new()
     {
-        protected readonly HospitalCaseDbContextFactory _dbContextFactory;
+        protected readonly HospitalCaseDbContext _dbContext;
+        protected readonly DbSet<TEntity> _dbSet;
 
-        protected BaseRepository(HospitalCaseDbContextFactory dbContextFactory)
+        protected BaseRepository(HospitalCaseDbContext dbContext)
         {
-            _dbContextFactory = dbContextFactory;
+            _dbContext = dbContext;
+            _dbSet = dbContext.Set<TEntity>();
         }
 
         public virtual async Task<TEntity> CreateAsync(TEntity entity)
         {
-            using(var dbContext = _dbContextFactory.CreateDbContext())
-            {
-                var result = await dbContext.Set<TEntity>().AddAsync(entity);
-                await dbContext.SaveChangesAsync();
+                var result = await _dbSet.AddAsync(entity);
+
+                await _dbContext.SaveChangesAsync();
 
                 return result.Entity;
-            }
         }
 
         public virtual async Task<bool> DeleteAsync(int id)
         {
-            using (var dbContext = _dbContextFactory.CreateDbContext())
-            {
-                TEntity found = await dbContext.Set<TEntity>().FirstOrDefaultAsync((e) => e.Id == id);
-                dbContext.Set<TEntity>().Remove(found);
-                await dbContext.SaveChangesAsync();
+            TEntity found = await _dbSet.FirstOrDefaultAsync((e) => e.Id == id);
 
-                return true;
+            if(found == null)
+            {
+                return false;
             }
+
+            _dbSet.Remove(found);
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
         }
 
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            using (var dbContext = _dbContextFactory.CreateDbContext())
-            {
-                IEnumerable<TEntity> found = await dbContext.Set<TEntity>().ToListAsync();
-
-                return found;
-            }
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
         public virtual async Task<TEntity> GetByIdAsync(int id)
         {
-            using (var dbContext = _dbContextFactory.CreateDbContext())
-            {
-                TEntity found = await dbContext.Set<TEntity>().FirstOrDefaultAsync((e) => e.Id == id);
-
-                return found;
-            }
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync((e) => e.Id == id);
         }
 
         public virtual async Task<TEntity> UpdateAsync(int id, TEntity entity)
         {
-            using (var dbContext = _dbContextFactory.CreateDbContext())
-            {
-                entity.Id = id;
-                dbContext.Set<TEntity>().Update(entity);
-                await dbContext.SaveChangesAsync();
+            var entry = await _dbSet.FindAsync(id);
 
-                return entity;
+            if (entry != null)
+            {
+                _dbContext.Entry(entry).State = EntityState.Detached;
             }
+
+            _dbSet.Attach(entity);
+
+            _dbContext.Entry(entity).State = EntityState.Modified;
+
+            await _dbContext.SaveChangesAsync();
+
+            return entity;
         }
     }
 }

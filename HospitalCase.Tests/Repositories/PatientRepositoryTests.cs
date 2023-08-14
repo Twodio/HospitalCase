@@ -14,17 +14,19 @@ namespace HospitalCase.Tests.Repositories
 {
     public class PatientRepositoryTests
     {
-        private readonly HospitalCaseDbContextFactory _contextFactory;
+        private readonly HospitalCaseDbContext _context;
 
         public PatientRepositoryTests()
         {
             // Configure the context to use In-Memory
-            _contextFactory = new HospitalCaseDbContextFactory(o => o.UseInMemoryDatabase("TestHospitalCaseDB"));
+            var options = new DbContextOptionsBuilder<HospitalCaseDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            _context = new HospitalCaseDbContext(options);
 
             // Seed Initial Data
-            using (var context = _contextFactory.CreateDbContext())
-            {
-                var patients = new HashSet<Patient>()
+            var patients = new HashSet<Patient>()
                 {
                     new Patient()
                     {
@@ -40,15 +42,14 @@ namespace HospitalCase.Tests.Repositories
                     }
                 };
 
-                context.People.AddRange(patients);
-                context.SaveChanges();
-            }
+            _context.People.AddRange(patients);
+            _context.SaveChanges();
         }
 
         [Fact]
         public async Task GetAll_ReturnsAll_Patients_Works()
         {
-            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
+            IPatientRepository mockRepository = new PatientRepository(_context);
 
             var results = await mockRepository.GetAllAsync();
 
@@ -59,7 +60,7 @@ namespace HospitalCase.Tests.Repositories
         [Fact]
         public async Task GetById_ReturnsOne_Patient_Works()
         {
-            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
+            IPatientRepository mockRepository = new PatientRepository(_context);
 
             var id = 3;
             var firstName = "Adam";
@@ -76,7 +77,7 @@ namespace HospitalCase.Tests.Repositories
         [Fact]
         public async Task Create_AddsOne_Patient_Works()
         {
-            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
+            IPatientRepository mockRepository = new PatientRepository(_context);
 
             var newEntry = new Patient()
             {
@@ -97,7 +98,7 @@ namespace HospitalCase.Tests.Repositories
         [Fact]
         public async Task Delete_RemovesOne_Patient_Works()
         {
-            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
+            IPatientRepository mockRepository = new PatientRepository(_context);
 
             var result = await mockRepository.DeleteAsync(3);
 
@@ -110,7 +111,7 @@ namespace HospitalCase.Tests.Repositories
         [Fact]
         public async Task Update_ChangesOne_Patient_Works()
         {
-            IPatientRepository mockRepository = new PatientRepository(_contextFactory);
+            IPatientRepository mockRepository = new PatientRepository(_context);
 
             var id = 3;
 
