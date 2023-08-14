@@ -30,7 +30,7 @@ O projeto é organizado em várias camadas para seguir os princípios da Clean A
 
 ## Utilização
 
-A API expõe vários endpoints para gerir pacientes, médicos, registos médicos, e autenticação. Quanto a documentação,  não se instalou o Swagger ou outro serviço semelhante.
+A API expõe vários endpoints para gerir pacientes, médicos, registos médicos, e autenticação (pendente). Quanto a documentação,  não se instalou o Swagger ou outro serviço semelhante.
 
 ## Testes
 
