@@ -1,6 +1,5 @@
-using HospitalCase.WebAPI.Interfaces;
-using HospitalCase.WebAPI.Models;
-using HospitalCase.WebAPI.Validators;
+using HospitalCase.Domain.Models;
+using HospitalCase.Domain.Validators;
 using Moq;
 using System;
 using Xunit;

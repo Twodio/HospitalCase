@@ -1,7 +1,7 @@
-using HospitalCase.WebAPI.Interfaces;
-using HospitalCase.WebAPI.Models;
-using HospitalCase.WebAPI.Repositories;
-using HospitalCase.WebAPI.Services;
+using HospitalCase.Application.Interfaces;
+using HospitalCase.Application.Services;
+using HospitalCase.Domain.Models;
+using HospitalCase.Insfrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

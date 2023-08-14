@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Exceptions\" />
+    <ProjectReference Include="..\HospitalCase.Application\HospitalCase.Application.csproj" />
+    <ProjectReference Include="..\HospitalCase.Domain\HospitalCase.Domain.csproj" />
+    <ProjectReference Include="..\HospitalCase.Insfrastructure\HospitalCase.Insfrastructure.csproj" />
   </ItemGroup>
 
 </Project>

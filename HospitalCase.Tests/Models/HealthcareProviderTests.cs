@@ -1,9 +1,6 @@
-﻿using HospitalCase.WebAPI.Models;
-using HospitalCase.WebAPI.Validators;
+﻿using HospitalCase.Domain.Models;
+using HospitalCase.Domain.Validators;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace HospitalCase.Tests.Models

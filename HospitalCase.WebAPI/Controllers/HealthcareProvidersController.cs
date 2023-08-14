@@ -1,13 +1,9 @@
-﻿using HospitalCase.WebAPI.Interfaces;
-using HospitalCase.WebAPI.Models;
-using HospitalCase.WebAPI.Repositories;
+﻿using HospitalCase.Application.Interfaces;
+using HospitalCase.Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace HospitalCase.WebAPI.Controllers

@@ -1,10 +1,9 @@
-﻿using HospitalCase.WebAPI.Interfaces;
-using HospitalCase.WebAPI.Models;
-using HospitalCase.WebAPI.Repositories;
+﻿using HospitalCase.Application.Interfaces;
+using HospitalCase.Domain.Models;
+using HospitalCase.Insfrastructure.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
