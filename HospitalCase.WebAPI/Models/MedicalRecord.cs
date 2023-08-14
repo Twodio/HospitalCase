@@ -2,9 +2,8 @@
 
 namespace HospitalCase.WebAPI.Models
 {
-    public class MedicalRecord
+    public class MedicalRecord : DomainObject
     {
-        public int Id { get; set; }
         public Patient Patient { get; set; }
         public HealthcareProvider HealthcareProvider { get; set; }
         public DateTime RecordDate { get; set; }

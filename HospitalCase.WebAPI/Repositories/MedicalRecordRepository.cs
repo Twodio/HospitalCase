@@ -15,11 +15,11 @@ namespace HospitalCase.WebAPI.Repositories
             _records = records;
         }
 
-        public Task<bool> CreateAsync(MedicalRecord entity)
+        public Task<MedicalRecord> CreateAsync(MedicalRecord entity)
         {
             _records.Add(entity);
 
-            return Task.FromResult(true);
+            return Task.FromResult(entity);
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -50,14 +50,14 @@ namespace HospitalCase.WebAPI.Repositories
             return Task.FromResult(foundEntry);
         }
 
-        public async Task<bool> UpdateAsync(int id, MedicalRecord entity)
+        public async Task<MedicalRecord> UpdateAsync(int id, MedicalRecord entity)
         {
             var foundEntry = await GetByIdAsync(id);
 
-            if (foundEntry == null)
-            {
-                return false;
-            }
+            //if (foundEntry == null)
+            //{
+            //    return false;
+            //}
 
             // Collections are reference types, updating the reference affects the collection instance
             foundEntry.Patient = entity.Patient;
@@ -68,7 +68,7 @@ namespace HospitalCase.WebAPI.Repositories
             foundEntry.Treatment = entity.Treatment;
             foundEntry.Notes = entity.Notes;
 
-            return true;
+            return foundEntry;
         }
     }
 }

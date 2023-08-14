@@ -68,7 +68,7 @@ namespace HospitalCase.Tests.Repositories
 
             var updatedMedicalRecordsList = await mockRepository.GetAllAsync();
 
-            Assert.True(result);
+            Assert.NotNull(result);
             Assert.Equal(3, updatedMedicalRecordsList.Count());
         }
 
@@ -104,7 +104,7 @@ namespace HospitalCase.Tests.Repositories
 
             var updatedMedicalRecord = await mockRepository.GetByIdAsync(id);
 
-            Assert.True(result);
+            Assert.NotNull(result);
             Assert.Equal(updatedDiagnosis, updatedMedicalRecord.Diagnosis);
         }
 

@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HospitalCase.WebAPI.Models
 {
-    public abstract class Person
+    public abstract class Person : DomainObject
     {
-        public int Id { get; set; }
-
         public string FirstName { get; set; }
 
         public string LastName { get; set; }

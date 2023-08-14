@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace HospitalCase.WebAPI.Repositories
 {
-    public class PersonRepository<T> : IPersonRepository<T> where T : Person
+    public class PersonRepository<TEntity> : IPersonRepository<TEntity> where TEntity : Person, new()
     {
-        protected readonly ICollection<T> _people;
+        protected readonly ICollection<TEntity> _people;
 
-        public PersonRepository(ICollection<T> people)
+        public PersonRepository(ICollection<TEntity> people)
         {
             _people = people;
         }
 
-        public Task<bool> CreateAsync(T entity)
+        public Task<TEntity> CreateAsync(TEntity entity)
         {
             _people.Add(entity);
 
-            return Task.FromResult(true);
+            return Task.FromResult(entity);
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -36,28 +36,28 @@ namespace HospitalCase.WebAPI.Repositories
             return true;
         }
 
-        public Task<IEnumerable<T>> GetAllAsync()
+        public Task<IEnumerable<TEntity>> GetAllAsync()
         {
             var entries = _people.AsEnumerable();
 
             return Task.FromResult(entries);
         }
 
-        public Task<T> GetByIdAsync(int id)
+        public Task<TEntity> GetByIdAsync(int id)
         {
             var foundEntry = _people.SingleOrDefault(e => e.Id == id);
 
             return Task.FromResult(foundEntry);
         }
 
-        public async Task<bool> UpdateAsync(int id, T entity)
+        public async Task<TEntity> UpdateAsync(int id, TEntity entity)
         {
             var foundEntry = await GetByIdAsync(id);
 
-            if (foundEntry == null)
-            {
-                return false;
-            }
+            //if (foundEntry == null)
+            //{
+            //    return false;
+            //}
 
             // Collections are reference types, updating the reference affects the collection instance
             foundEntry.FirstName = entity.FirstName;
@@ -65,7 +65,7 @@ namespace HospitalCase.WebAPI.Repositories
             foundEntry.BirthDate = entity.BirthDate;
             foundEntry.PhoneNumber = entity.PhoneNumber;
 
-            return true;
+            return foundEntry;
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace HospitalCase.WebAPI.Interfaces
 {
-    public interface IPersonRepository<T> : IBaseRepository<int, T> where T : Person
+    public interface IPersonRepository<TEntity> : IBaseRepository<int, TEntity> where TEntity : Person, new()
     {
     }
 }
