@@ -1,4 +1,7 @@
+using HospitalCase.WebAPI.Interfaces;
 using HospitalCase.WebAPI.Models;
+using HospitalCase.WebAPI.Validators;
+using Moq;
 using System;
 using Xunit;
 
@@ -7,7 +10,7 @@ namespace HospitalCase.Tests.Models
     public class PatientTests
     {
         [Fact]
-        public void Patient_With_Parameterless_Contructor_Works()
+        public void Patient_With_ValidFields_ReturnsNoErrors()
         {
             var firstName = "Jon";
             var lastName = "Doe";
@@ -16,11 +19,60 @@ namespace HospitalCase.Tests.Models
             {
                 FirstName = firstName,
                 LastName = lastName,
+                CPF = "000.000.000-00",
+                PhoneNumber = "+1234567890"
             };
 
-            Assert.Equal(firstName, patient.FirstName);
-            Assert.Equal(lastName, patient.LastName);
+            var mockValidator = new Mock<PersonValidator>();
+            var validation = mockValidator.Object.Validate(patient);
+
+            Assert.True(validation.IsValid);
             Assert.NotNull(patient.MedicalRecords);
+            Assert.Empty(validation.Errors);
+        }
+
+        [Fact]
+        public void Patient_With_InvalidCPF_ReturnsError()
+        {
+            var firstName = "Jon";
+            var lastName = "Doe";
+
+            var patient = new Patient()
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                CPF = "000.000.000-0",
+                PhoneNumber = "+1234567890"
+            };
+
+            var mockValidator = new Mock<PersonValidator>();
+            var validation = mockValidator.Object.Validate(patient);
+
+            Assert.False(validation.IsValid);
+            Assert.NotNull(patient.MedicalRecords);
+            Assert.Single(validation.Errors);
+        }
+
+        [Fact]
+        public void Patient_With_InvalidPhoneNumber_ReturnsError()
+        {
+            var firstName = "Jon";
+            var lastName = "Doe";
+
+            var patient = new Patient()
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                CPF = "000.000.000-00",
+                PhoneNumber = "01234567890"
+            };
+
+            var mockValidator = new Mock<PersonValidator>();
+            var validation = mockValidator.Object.Validate(patient);
+
+            Assert.False(validation.IsValid);
+            Assert.NotNull(patient.MedicalRecords);
+            Assert.Single(validation.Errors);
         }
 
         [Fact]
