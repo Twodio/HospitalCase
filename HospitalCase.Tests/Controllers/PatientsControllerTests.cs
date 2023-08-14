@@ -2,6 +2,7 @@
 using HospitalCase.WebAPI.Interfaces;
 using HospitalCase.WebAPI.Models;
 using HospitalCase.WebAPI.Repositories;
+using HospitalCase.WebAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -23,7 +24,9 @@ namespace HospitalCase.Tests.Controllers
             IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
-            var controller = new PatientsController(mockLogger.Object, mockRepository);
+            IPatientService mockService = new PatientService(mockRepository);
+
+            var controller = new PatientsController(mockLogger.Object, mockService);
 
             var result = await controller.Get();
 
@@ -39,7 +42,9 @@ namespace HospitalCase.Tests.Controllers
             IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
-            var controller = new PatientsController(mockLogger.Object, mockRepository);
+            IPatientService mockService = new PatientService(mockRepository);
+
+            var controller = new PatientsController(mockLogger.Object, mockService);
 
             var result = await controller.Get(3);
 
@@ -55,7 +60,9 @@ namespace HospitalCase.Tests.Controllers
             IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
-            var controller = new PatientsController(mockLogger.Object, mockRepository);
+            IPatientService mockService = new PatientService(mockRepository);
+
+            var controller = new PatientsController(mockLogger.Object, mockService);
 
             var result = await controller.Get(0);
 
@@ -69,7 +76,9 @@ namespace HospitalCase.Tests.Controllers
             IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
-            var controller = new PatientsController(mockLogger.Object, mockRepository);
+            IPatientService mockService = new PatientService(mockRepository);
+
+            var controller = new PatientsController(mockLogger.Object, mockService);
 
             var result = await controller.Get(5);
 
@@ -83,7 +92,9 @@ namespace HospitalCase.Tests.Controllers
             IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
-            var controller = new PatientsController(mockLogger.Object, mockRepository);
+            IPatientService mockService = new PatientService(mockRepository);
+
+            var controller = new PatientsController(mockLogger.Object, mockService);
 
             var newEntry = new Patient()
             {
@@ -106,7 +117,9 @@ namespace HospitalCase.Tests.Controllers
             IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
-            var controller = new PatientsController(mockLogger.Object, mockRepository);
+            IPatientService mockService = new PatientService(mockRepository);
+
+            var controller = new PatientsController(mockLogger.Object, mockService);
 
             var newEntry = new Patient()
             {
@@ -127,7 +140,9 @@ namespace HospitalCase.Tests.Controllers
             IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
-            var controller = new PatientsController(mockLogger.Object, mockRepository);
+            IPatientService mockService = new PatientService(mockRepository);
+
+            var controller = new PatientsController(mockLogger.Object, mockService);
 
             var newEntry = new Patient()
             {
@@ -148,7 +163,9 @@ namespace HospitalCase.Tests.Controllers
             IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
-            var controller = new PatientsController(mockLogger.Object, mockRepository);
+            IPatientService mockService = new PatientService(mockRepository);
+
+            var controller = new PatientsController(mockLogger.Object, mockService);
 
             var newEntry = new Patient()
             {
@@ -169,7 +186,9 @@ namespace HospitalCase.Tests.Controllers
             IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
-            var controller = new PatientsController(mockLogger.Object, mockRepository);
+            IPatientService mockService = new PatientService(mockRepository);
+
+            var controller = new PatientsController(mockLogger.Object, mockService);
 
             var result = await controller.Delete(5);
 
@@ -183,7 +202,9 @@ namespace HospitalCase.Tests.Controllers
             IPatientRepository mockRepository = new PatientRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
-            var controller = new PatientsController(mockLogger.Object, mockRepository);
+            IPatientService mockService = new PatientService(mockRepository);
+
+            var controller = new PatientsController(mockLogger.Object, mockService);
 
             var result = await controller.Delete(4);
 

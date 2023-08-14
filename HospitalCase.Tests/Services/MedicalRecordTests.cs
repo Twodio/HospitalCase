@@ -1,6 +1,7 @@
 ﻿using HospitalCase.WebAPI.Interfaces;
 using HospitalCase.WebAPI.Models;
 using HospitalCase.WebAPI.Repositories;
+using HospitalCase.WebAPI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,41 +9,47 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace HospitalCase.Tests.Repositories
+namespace HospitalCase.Tests.Services
 {
     public class MedicalRecordTests
     {
         [Fact]
-        public async Task GetAll_ReturnsAll_MedicalRecords_Works()
+        public async Task GetAll_ReturnsAll_MedicalRecords()
         {
             var people = await GetTestMedicalRecords();
             IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
 
-            var results = await mockRepository.GetAllAsync();
+            IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
+
+            var results = await mockService.GetAllAsync();
 
             Assert.NotNull(results);
             Assert.Equal(2, results.Count());
         }
 
         [Fact]
-        public async Task GetById_ReturnsOne_MedicalRecord_Works()
+        public async Task GetById_ReturnsOne_MedicalRecord()
         {
             var people = await GetTestMedicalRecords();
             IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
 
+            IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
+
             var id = 1;
 
-            var result = await mockRepository.GetByIdAsync(id);
+            var result = await mockService.GetByIdAsync(id);
 
             Assert.NotNull(result);
             Assert.Equal(id, result.Id);
         }
 
         [Fact]
-        public async Task Create_AddsOne_MedicalRecord_Works()
+        public async Task Create_AddsOne_MedicalRecord()
         {
             var people = await GetTestMedicalRecords();
             IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
+
+            IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
 
             var newEntry = new MedicalRecord()
             {
@@ -64,45 +71,49 @@ namespace HospitalCase.Tests.Repositories
                 Diagnosis = "Flu"
             };
 
-            var result = await mockRepository.CreateAsync(newEntry);
+            var result = await mockService.CreateAsync(newEntry);
 
-            var updatedMedicalRecordsList = await mockRepository.GetAllAsync();
+            var updatedMedicalRecordsList = await mockService.GetAllAsync();
 
             Assert.NotNull(result);
             Assert.Equal(3, updatedMedicalRecordsList.Count());
         }
 
         [Fact]
-        public async Task Delete_RemovesOne_MedicalRecord_Works()
+        public async Task Delete_RemovesOne_MedicalRecord()
         {
             var people = await GetTestMedicalRecords();
             IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
 
-            var result = await mockRepository.DeleteAsync(1);
+            IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
 
-            var updatedMedicalRecordsList = await mockRepository.GetAllAsync();
+            var result = await mockService.DeleteAsync(1);
+
+            var updatedMedicalRecordsList = await mockService.GetAllAsync();
 
             Assert.True(result);
             Assert.Single(updatedMedicalRecordsList);
         }
 
         [Fact]
-        public async Task Update_ChangesOne_MedicalRecord_Works()
+        public async Task Update_ChangesOne_MedicalRecord()
         {
             var people = await GetTestMedicalRecords();
             IMedicalRecordRepository mockRepository = new MedicalRecordRepository(people.ToHashSet());
 
+            IMedicalRecordService mockService = new MedicalRecordService(mockRepository);
+
             var id = 1;
 
-            var foundMedicalRecord = await mockRepository.GetByIdAsync(id);
+            var foundMedicalRecord = await mockService.GetByIdAsync(id);
 
             var updatedDiagnosis = "changed";
 
             foundMedicalRecord.Diagnosis = updatedDiagnosis;
 
-            var result = await mockRepository.UpdateAsync(id, foundMedicalRecord);
+            var result = await mockService.UpdateAsync(id, foundMedicalRecord);
 
-            var updatedMedicalRecord = await mockRepository.GetByIdAsync(id);
+            var updatedMedicalRecord = await mockService.GetByIdAsync(id);
 
             Assert.NotNull(result);
             Assert.Equal(updatedDiagnosis, updatedMedicalRecord.Diagnosis);

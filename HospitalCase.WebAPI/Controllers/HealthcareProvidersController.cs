@@ -20,12 +20,12 @@ namespace HospitalCase.WebAPI.Controllers
     public class HealthcareProvidersController : ControllerBase
     {
         private readonly ILogger<HealthcareProvidersController> _logger;
-        private readonly IHealthcareProviderRepository _healthcareProvidersRepository;
+        private readonly IHealthcareProviderService _healthcareProvidersService;
 
-        public HealthcareProvidersController(ILogger<HealthcareProvidersController> logger, IHealthcareProviderRepository healthcareProvidersRepository)
+        public HealthcareProvidersController(ILogger<HealthcareProvidersController> logger, IHealthcareProviderService healthcareProvidersService)
         {
             _logger = logger;
-            _healthcareProvidersRepository = healthcareProvidersRepository;
+            _healthcareProvidersService = healthcareProvidersService;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace HospitalCase.WebAPI.Controllers
         {
             try
             {
-                var result = await _healthcareProvidersRepository.GetAllAsync();
+                var result = await _healthcareProvidersService.GetAllAsync();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -69,7 +69,7 @@ namespace HospitalCase.WebAPI.Controllers
 
             try
             {
-                var foundEntry = await _healthcareProvidersRepository.GetByIdAsync(id);
+                var foundEntry = await _healthcareProvidersService.GetByIdAsync(id);
 
                 if (foundEntry == null) return NotFound();
 
@@ -96,7 +96,7 @@ namespace HospitalCase.WebAPI.Controllers
         {
             try
             {
-                await _healthcareProvidersRepository.CreateAsync(healthcareProvider);
+                await _healthcareProvidersService.CreateAsync(healthcareProvider);
                 return CreatedAtAction(nameof(Get), new { id = healthcareProvider.Id }, healthcareProvider);
             }
             catch (Exception ex)
@@ -126,11 +126,11 @@ namespace HospitalCase.WebAPI.Controllers
 
             try
             {
-                var foundEntry = await _healthcareProvidersRepository.GetByIdAsync(id);
+                var foundEntry = await _healthcareProvidersService.GetByIdAsync(id);
 
                 if (foundEntry == null) return NotFound();
 
-                await _healthcareProvidersRepository.UpdateAsync(id, healthcareProvider);
+                await _healthcareProvidersService.UpdateAsync(id, healthcareProvider);
 
                 return NoContent();
             }
@@ -160,11 +160,11 @@ namespace HospitalCase.WebAPI.Controllers
 
             try
             {
-                var foundEntry = await _healthcareProvidersRepository.GetByIdAsync(id);
+                var foundEntry = await _healthcareProvidersService.GetByIdAsync(id);
 
                 if (foundEntry == null) return NotFound();
 
-                await _healthcareProvidersRepository.DeleteAsync(id);
+                await _healthcareProvidersService.DeleteAsync(id);
 
                 return NoContent();
             }

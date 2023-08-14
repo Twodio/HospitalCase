@@ -2,6 +2,7 @@
 using HospitalCase.WebAPI.Interfaces;
 using HospitalCase.WebAPI.Models;
 using HospitalCase.WebAPI.Repositories;
+using HospitalCase.WebAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -23,7 +24,9 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            var controller = new HealthcareProvidersController(mockLogger.Object, mockRepository);
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+
+            var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
             var result = await controller.Get();
 
@@ -39,7 +42,9 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            var controller = new HealthcareProvidersController(mockLogger.Object, mockRepository);
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+
+            var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
             var result = await controller.Get(1);
 
@@ -55,7 +60,9 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            var controller = new HealthcareProvidersController(mockLogger.Object, mockRepository);
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+
+            var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
             var result = await controller.Get(0);
 
@@ -69,7 +76,9 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            var controller = new HealthcareProvidersController(mockLogger.Object, mockRepository);
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+
+            var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
             var result = await controller.Get(5);
 
@@ -83,7 +92,9 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            var controller = new HealthcareProvidersController(mockLogger.Object, mockRepository);
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+
+            var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
             var newEntry = new HealthcareProvider()
             {
@@ -107,7 +118,9 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            var controller = new HealthcareProvidersController(mockLogger.Object, mockRepository);
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+
+            var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
             var newEntry = new HealthcareProvider()
             {
@@ -129,7 +142,9 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            var controller = new HealthcareProvidersController(mockLogger.Object, mockRepository);
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+
+            var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
             var newEntry = new HealthcareProvider()
             {
@@ -151,7 +166,9 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            var controller = new HealthcareProvidersController(mockLogger.Object, mockRepository);
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+
+            var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
             var newEntry = new HealthcareProvider()
             {
@@ -173,7 +190,9 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            var controller = new HealthcareProvidersController(mockLogger.Object, mockRepository);
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+
+            var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
             var result = await controller.Delete(4);
 
@@ -187,7 +206,9 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(people.ToHashSet());
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            var controller = new HealthcareProvidersController(mockLogger.Object, mockRepository);
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+
+            var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
             var result = await controller.Delete(2);
 

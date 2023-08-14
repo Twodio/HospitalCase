@@ -1,6 +1,7 @@
 using HospitalCase.WebAPI.Interfaces;
 using HospitalCase.WebAPI.Models;
 using HospitalCase.WebAPI.Repositories;
+using HospitalCase.WebAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -79,6 +80,11 @@ namespace HospitalCase.WebAPI
             services.AddSingleton<IHealthcareProviderRepository>(new HealthcareProviderRepository(healthcareproviders));
             services.AddSingleton<IPatientRepository>(new PatientRepository(patients));
             services.AddSingleton<IMedicalRecordRepository>(new MedicalRecordRepository(medicalRecords));
+
+            // Register domain services
+            services.AddSingleton<IHealthcareProviderService>(s => new HealthcareProviderService(s.GetRequiredService<IHealthcareProviderRepository>()));
+            services.AddSingleton<IPatientService>(s => new PatientService(s.GetRequiredService<IPatientRepository>()));
+            services.AddSingleton<IMedicalRecordService>(s => new MedicalRecordService(s.GetRequiredService<IMedicalRecordRepository>()));
 
             // Register Controllers
             services.AddControllers();

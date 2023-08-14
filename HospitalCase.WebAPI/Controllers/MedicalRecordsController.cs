@@ -19,12 +19,12 @@ namespace HospitalCase.WebAPI.Controllers
     public class MedicalRecordsController : ControllerBase
     {
         private readonly ILogger<MedicalRecordsController> _logger;
-        private readonly IMedicalRecordRepository _medicalRecordsRepository;
+        private readonly IMedicalRecordService _medicalRecordsService;
 
-        public MedicalRecordsController(ILogger<MedicalRecordsController> logger, IMedicalRecordRepository medicalRecordsRepository)
+        public MedicalRecordsController(ILogger<MedicalRecordsController> logger, IMedicalRecordService medicalRecordsService)
         {
             _logger = logger;
-            _medicalRecordsRepository = medicalRecordsRepository;
+            _medicalRecordsService = medicalRecordsService;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace HospitalCase.WebAPI.Controllers
         {
             try
             {
-                var result = await _medicalRecordsRepository.GetAllAsync();
+                var result = await _medicalRecordsService.GetAllAsync();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -68,7 +68,7 @@ namespace HospitalCase.WebAPI.Controllers
 
             try
             {
-                var foundEntry = await _medicalRecordsRepository.GetByIdAsync(id);
+                var foundEntry = await _medicalRecordsService.GetByIdAsync(id);
 
                 if (foundEntry == null) return NotFound();
 
@@ -95,7 +95,7 @@ namespace HospitalCase.WebAPI.Controllers
         {
             try
             {
-                await _medicalRecordsRepository.CreateAsync(medicalRecord);
+                await _medicalRecordsService.CreateAsync(medicalRecord);
                 return CreatedAtAction(nameof(Get), new { id = medicalRecord.Id }, medicalRecord);
             }
             catch (Exception ex)
@@ -125,11 +125,11 @@ namespace HospitalCase.WebAPI.Controllers
 
             try
             {
-                var foundEntry = await _medicalRecordsRepository.GetByIdAsync(id);
+                var foundEntry = await _medicalRecordsService.GetByIdAsync(id);
 
                 if (foundEntry == null) return NotFound();
 
-                await _medicalRecordsRepository.UpdateAsync(id, medicalRecord);
+                await _medicalRecordsService.UpdateAsync(id, medicalRecord);
 
                 return NoContent();
             }
@@ -159,11 +159,11 @@ namespace HospitalCase.WebAPI.Controllers
 
             try
             {
-                var foundEntry = await _medicalRecordsRepository.GetByIdAsync(id);
+                var foundEntry = await _medicalRecordsService.GetByIdAsync(id);
 
                 if (foundEntry == null) return NotFound();
 
-                await _medicalRecordsRepository.DeleteAsync(id);
+                await _medicalRecordsService.DeleteAsync(id);
 
                 return NoContent();
             }
