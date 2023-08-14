@@ -34,12 +34,22 @@ namespace HospitalCase.WebAPI.Validators
             return result;
         }
 
+        /// <summary>
+        /// Validates the CPF using regex
+        /// </summary>
+        /// <param name="cpf"></param>
+        /// <returns>True if the CPF is valid</returns>
         private bool IsValidCPF(string cpf)
         {
             var regex = new Regex(@"\d{3}\.\d{3}\.\d{3}-\d{2}");
             return regex.IsMatch(cpf);
         }
 
+        /// <summary>
+        /// Validates the phone number using regex and the e.164 format
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <returns>True if the phone number is valid</returns>
         private bool IsValidPhoneNumber(string phoneNumber)
         {
             var regex = new Regex(@"^\+?[1-9]\d{1,14}$");

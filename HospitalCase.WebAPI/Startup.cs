@@ -24,6 +24,7 @@ namespace HospitalCase.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Local reporitory's data for HealthcareProviders
             var healthcareproviders = new HashSet<HealthcareProvider>()
             {
                 new HealthcareProvider()
@@ -42,6 +43,7 @@ namespace HospitalCase.WebAPI
                 }
             };
 
+            // Local reporitory's data for Patients
             var patients = new HashSet<Patient>()
             {
                 new Patient()
@@ -52,6 +54,7 @@ namespace HospitalCase.WebAPI
                 }
             };
 
+            // Local reporitory's data for MedicalRecords
             var medicalRecords = new HashSet<MedicalRecord>()
             {
                 new MedicalRecord()
@@ -72,10 +75,12 @@ namespace HospitalCase.WebAPI
                 }
             };
 
+            // Register repositories
             services.AddSingleton<IHealthcareProviderRepository>(new HealthcareProviderRepository(healthcareproviders));
             services.AddSingleton<IPatientRepository>(new PatientRepository(patients));
             services.AddSingleton<IMedicalRecordRepository>(new MedicalRecordRepository(medicalRecords));
 
+            // Register Controllers
             services.AddControllers();
         }
 

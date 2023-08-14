@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>aspnet-HospitalCase.WebAPI-4636740a-ed62-4f4a-97a6-a668289d59af</UserSecretsId>
     <WebProject_DirectoryAccessLevelKey>0</WebProject_DirectoryAccessLevelKey>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
