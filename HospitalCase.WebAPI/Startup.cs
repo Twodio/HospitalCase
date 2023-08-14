@@ -1,9 +1,11 @@
 using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Services;
 using HospitalCase.Domain.Models;
+using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -75,6 +77,16 @@ namespace HospitalCase.WebAPI
                     Diagnosis = "Covid-19"
                 }
             };
+
+            // Configure Entity Framework Database
+            string connectionString = Configuration.GetConnectionString("DefaultConnection");
+
+            Action<DbContextOptionsBuilder> optionsBuilder = (options) => options.UseSqlServer(connectionString);
+            HospitalCaseDbContextFactory dbContextFactory = new HospitalCaseDbContextFactory(optionsBuilder);
+
+            // Register Entity Framework
+            services.AddSingleton<HospitalCaseDbContextFactory>(dbContextFactory);
+            services.AddDbContext<HospitalCaseDbContext>(optionsBuilder);
 
             // Register repositories
             services.AddSingleton<IHealthcareProviderRepository>(new HealthcareProviderRepository(healthcareproviders));
