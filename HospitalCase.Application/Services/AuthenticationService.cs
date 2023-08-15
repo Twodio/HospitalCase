@@ -19,13 +19,13 @@ namespace HospitalCase.Application.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IConfiguration _configuration;
+        private readonly ITokenService _tokenService;
 
-        public AuthenticationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+        public AuthenticationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _configuration = configuration;
+            _tokenService = tokenService;
         }
 
         public async Task<LoginResult> LoginAsync(LoginRequest request)
@@ -46,18 +46,12 @@ namespace HospitalCase.Application.Services
             }
 
             // Create the Jwt if the credentials are valid
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:key"]));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Issuer"],
-                expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: credentials);
+            var jwtToken = _tokenService.CreateToken();
 
             var result = new LoginResult()
             {
                 Success = true,
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Token = jwtToken,
                 Message = "Success!"
             };
 

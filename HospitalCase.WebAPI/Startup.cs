@@ -74,6 +74,7 @@ namespace HospitalCase.WebAPI
             services.AddScoped<IHealthcareProviderService>(s => new HealthcareProviderService(s.GetRequiredService<IHealthcareProviderRepository>()));
             services.AddScoped<IPatientService>(s => new PatientService(s.GetRequiredService<IPatientRepository>()));
             services.AddScoped<IMedicalRecordService>(s => new MedicalRecordService(s.GetRequiredService<IMedicalRecordRepository>()));
+            services.AddScoped<ITokenService, TokenService>();
 
             // Register other dependencies
             services.AddTransient<IDesignTimeDbContextFactory<HospitalCaseDbContext>, HospitalCaseDbContextFactory>(s => s.GetRequiredService<HospitalCaseDbContextFactory>());
