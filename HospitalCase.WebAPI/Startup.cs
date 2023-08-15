@@ -1,3 +1,4 @@
+using HospitalCase.Application.Common;
 using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Models;
 using HospitalCase.Application.Services;
@@ -62,6 +63,14 @@ namespace HospitalCase.WebAPI
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
+            });
+
+            // Register authorization policies
+            services.AddAuthorization(options =>
+            {
+                options.AddPatientsPolicies();
+                options.AddHealthcareProvidersPolicies();
+                options.AddMedicalRecordsPolicies();
             });
 
             // Register repositories

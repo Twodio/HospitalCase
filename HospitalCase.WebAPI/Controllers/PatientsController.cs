@@ -1,4 +1,5 @@
-﻿using HospitalCase.Application.Interfaces;
+﻿using HospitalCase.Application.Common;
+using HospitalCase.Application.Interfaces;
 using HospitalCase.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,6 +33,7 @@ namespace HospitalCase.WebAPI.Controllers
         /// <returns>Detailed information of the patients</returns>
         /// <response code="200">Returns the patients list</response>
         /// <response code="500">If there is a server error</response>
+        [Authorize(Policy = PatientsPolicies.View)]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -58,6 +60,7 @@ namespace HospitalCase.WebAPI.Controllers
         /// <response code="200">Returns the patient details</response>
         /// <response code="404">If the patient is not found</response>
         /// <response code="500">If there is a server error</response>
+        [Authorize(Policy = PatientsPolicies.View)]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -88,6 +91,7 @@ namespace HospitalCase.WebAPI.Controllers
         /// <returns>The created patient</returns>
         /// <response code="201">Returns the created patientr</response>
         /// <response code="500">If there is a server error</response>
+        [Authorize(Policy = PatientsPolicies.Create)]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -114,6 +118,7 @@ namespace HospitalCase.WebAPI.Controllers
         /// <response code="204">If the patient was updated</response>
         /// <response code="400">If the request is mallformed</response>
         /// <response code="500">If there is a server error</response>
+        [Authorize(Policy = PatientsPolicies.Edit)]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -147,6 +152,7 @@ namespace HospitalCase.WebAPI.Controllers
         /// <response code="204">If the patient was deleted</response>
         /// <response code="400">If the request is mallformed</response>
         /// <response code="500">If there is a server error</response>
+        [Authorize(Policy = PatientsPolicies.Edit)]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

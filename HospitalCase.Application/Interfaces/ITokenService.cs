@@ -1,11 +1,13 @@
-﻿using System;
+﻿using HospitalCase.Application.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HospitalCase.Application.Interfaces
 {
     public interface ITokenService
     {
-        string CreateToken();
+        Task<string> CreateToken(ApplicationUser user);
     }
 }

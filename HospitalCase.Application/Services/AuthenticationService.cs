@@ -45,8 +45,10 @@ namespace HospitalCase.Application.Services
                 };
             }
 
+            var user = await _userManager.FindByNameAsync(request.Username);
+
             // Create the Jwt if the credentials are valid
-            var jwtToken = _tokenService.CreateToken();
+            var jwtToken = await _tokenService.CreateToken(user);
 
             var result = new LoginResult()
             {
