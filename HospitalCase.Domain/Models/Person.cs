@@ -15,5 +15,7 @@ namespace HospitalCase.Domain.Models
         public string CPF { get; set; }
 
         public string PhotoBase64 { get; set; }
+
+        public string Address { get; set; }
     }
 }

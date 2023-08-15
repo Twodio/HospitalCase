@@ -4,14 +4,16 @@ using HospitalCase.Insfrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HospitalCase.Insfrastructure.Migrations
 {
     [DbContext(typeof(HospitalCaseDbContext))]
-    partial class HospitalCaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230815150658_AddedAddressColumToPerson")]
+    partial class AddedAddressColumToPerson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
