@@ -1,5 +1,6 @@
 ﻿using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Services;
+using HospitalCase.Domain.Interfaces;
 using HospitalCase.Domain.Models;
 using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
@@ -56,7 +57,8 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+            var mockValidator = new Mock<IValidator<HealthcareProvider>>();
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository, mockValidator.Object);
 
             var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
@@ -73,7 +75,8 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+            var mockValidator = new Mock<IValidator<HealthcareProvider>>();
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository, mockValidator.Object);
 
             var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
@@ -90,7 +93,8 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+            var mockValidator = new Mock<IValidator<HealthcareProvider>>();
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository, mockValidator.Object);
 
             var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
@@ -105,7 +109,8 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+            var mockValidator = new Mock<IValidator<HealthcareProvider>>();
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository, mockValidator.Object);
 
             var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
@@ -120,7 +125,8 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+            var mockValidator = new Mock<IValidator<HealthcareProvider>>();
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository, mockValidator.Object);
 
             var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
@@ -144,7 +150,8 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+            var mockValidator = new Mock<IValidator<HealthcareProvider>>();
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository, mockValidator.Object);
 
             var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
@@ -167,7 +174,8 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+            var mockValidator = new Mock<IValidator<HealthcareProvider>>();
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository, mockValidator.Object);
 
             var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
@@ -190,7 +198,8 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+            var mockValidator = new Mock<IValidator<HealthcareProvider>>();
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository, mockValidator.Object);
 
             var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
@@ -213,7 +222,8 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+            var mockValidator = new Mock<IValidator<HealthcareProvider>>();
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository, mockValidator.Object);
 
             var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 
@@ -228,7 +238,8 @@ namespace HospitalCase.Tests.Controllers
             IHealthcareProviderRepository mockRepository = new HealthcareProviderRepository(_context);
             var mockLogger = new Mock<ILogger<HealthcareProvidersController>>();
 
-            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository);
+            var mockValidator = new Mock<IValidator<HealthcareProvider>>();
+            IHealthcareProviderService mockService = new HealthcareProviderService(mockRepository, mockValidator.Object);
 
             var controller = new HealthcareProvidersController(mockLogger.Object, mockService);
 

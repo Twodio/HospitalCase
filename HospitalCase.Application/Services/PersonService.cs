@@ -1,22 +1,29 @@
 ﻿using HospitalCase.Application.Interfaces;
+using HospitalCase.Domain.Interfaces;
 using HospitalCase.Domain.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HospitalCase.Application.Services
 {
     public class PersonService<TEntity> : IPersonService<int, TEntity> where TEntity : Person, new()
     {
-        private readonly IPersonRepository<TEntity> _personRepository;
+        protected readonly IPersonRepository<TEntity> _personRepository;
+        protected readonly IValidator<TEntity> _validator;
 
-        public PersonService(IPersonRepository<TEntity> personRepository)
+        public PersonService(IPersonRepository<TEntity> personRepository, IValidator<TEntity> validator)
         {
             _personRepository = personRepository;
+            _validator = validator;
         }
 
         public async virtual Task<TEntity> CreateAsync(TEntity entity)
         {
             // Validate
+
+            _validator.Validate(entity);
 
             var result = await _personRepository.CreateAsync(entity);
 
@@ -57,6 +64,8 @@ namespace HospitalCase.Application.Services
         public async virtual Task<TEntity> UpdateAsync(int id, TEntity entity)
         {
             // Validate
+
+            _validator.Validate(entity);
 
             var result = await _personRepository.UpdateAsync(id, entity);
 

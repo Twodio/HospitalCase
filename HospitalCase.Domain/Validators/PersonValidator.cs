@@ -1,36 +1,33 @@
-﻿using HospitalCase.Domain.Interfaces;
+﻿using HospitalCase.Domain.Exceptions;
+using HospitalCase.Domain.Interfaces;
 using HospitalCase.Domain.Models;
 using System.Text.RegularExpressions;
 
 namespace HospitalCase.Domain.Validators
 {
-    public class PersonValidator : IValidator<Person>
+    public class PersonValidator<TEntity> : IValidator<TEntity> where TEntity : Person, new()
     {
-        public ValidationResult Validate(Person entity)
+        public void Validate(TEntity entity)
         {
-            var result = new ValidationResult();
-
             if(string.IsNullOrWhiteSpace(entity.FirstName) || entity.FirstName.Length > 50)
             {
-                result.Errors.Add("First name is required ans must be less than 50 characters.");
+                throw new FirstAndLastNameAreRequiredException("First name is required ans must be less than 50 characters.", entity.FirstName, entity.LastName);
             }
 
             if (string.IsNullOrWhiteSpace(entity.LastName) || entity.LastName.Length > 50)
             {
-                result.Errors.Add("Last name is required ans must be less than 50 characters.");
+                throw new FirstAndLastNameAreRequiredException("First name is required ans must be less than 50 characters.", entity.FirstName, entity.LastName);
             }
 
             if (string.IsNullOrWhiteSpace(entity.CPF) || !IsValidCPF(entity.CPF))
             {
-                result.Errors.Add("CPF is required and must be valid.");
+                throw new InvalidCPFException("CPF is required and must be valid.", entity.CPF);
             }
 
             if (string.IsNullOrWhiteSpace(entity.PhoneNumber) || !IsValidPhoneNumber(entity.PhoneNumber))
             {
-                result.Errors.Add("Phone number is required and must be valid.");
+                throw new InvalidPhoneNumberException("Phone number is required and must be valid.", entity.PhoneNumber);
             }
-
-            return result;
         }
 
         /// <summary>

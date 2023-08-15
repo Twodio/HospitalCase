@@ -97,6 +97,7 @@ namespace HospitalCase.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Post(Patient patient)
         {
+            // TODO: BadRequest when the request has invalid first, last names or invalid phone number and cpf
             try
             {
                 await _patientsService.CreateAsync(patient);
@@ -126,6 +127,8 @@ namespace HospitalCase.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Put(int id, Patient patient)
         {
+            // TODO: BadRequest when the request has invalid first, last names or invalid phone number and cpf
+
             if (id != patient.Id) return BadRequest();
 
             try

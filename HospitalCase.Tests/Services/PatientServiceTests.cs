@@ -1,5 +1,6 @@
 ﻿using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Services;
+using HospitalCase.Domain.Interfaces;
 using HospitalCase.Domain.Models;
 using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
@@ -52,7 +53,8 @@ namespace HospitalCase.Tests.Services
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
 
             var results = await mockService.GetAllAsync();
 
@@ -65,7 +67,8 @@ namespace HospitalCase.Tests.Services
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
 
             var id = 3;
             var firstName = "Adam";
@@ -84,7 +87,8 @@ namespace HospitalCase.Tests.Services
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
 
             var newEntry = new Patient()
             {
@@ -107,7 +111,8 @@ namespace HospitalCase.Tests.Services
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
 
             var result = await mockService.DeleteAsync(3);
 
@@ -122,7 +127,8 @@ namespace HospitalCase.Tests.Services
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
 
             var id = 3;
 

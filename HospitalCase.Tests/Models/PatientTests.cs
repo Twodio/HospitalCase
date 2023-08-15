@@ -1,7 +1,9 @@
+using HospitalCase.Domain.Exceptions;
 using HospitalCase.Domain.Models;
 using HospitalCase.Domain.Validators;
 using Moq;
 using System;
+using System.Numerics;
 using Xunit;
 
 namespace HospitalCase.Tests.Models
@@ -22,12 +24,10 @@ namespace HospitalCase.Tests.Models
                 PhoneNumber = "+1234567890"
             };
 
-            var mockValidator = new Mock<PersonValidator>();
-            var validation = mockValidator.Object.Validate(patient);
+            var mockValidator = new PersonValidator<Patient>();
+            mockValidator.Validate(patient);
 
-            Assert.True(validation.IsValid);
             Assert.NotNull(patient.MedicalRecords);
-            Assert.Empty(validation.Errors);
         }
 
         [Fact]
@@ -44,12 +44,14 @@ namespace HospitalCase.Tests.Models
                 PhoneNumber = "+1234567890"
             };
 
-            var mockValidator = new Mock<PersonValidator>();
-            var validation = mockValidator.Object.Validate(patient);
+            var mockValidator = new PersonValidator<Patient>();
 
-            Assert.False(validation.IsValid);
+            Assert.ThrowsAny<InvalidCPFException>(() =>
+            {
+                mockValidator.Validate(patient);
+            });
+
             Assert.NotNull(patient.MedicalRecords);
-            Assert.Single(validation.Errors);
         }
 
         [Fact]
@@ -66,12 +68,14 @@ namespace HospitalCase.Tests.Models
                 PhoneNumber = "01234567890"
             };
 
-            var mockValidator = new Mock<PersonValidator>();
-            var validation = mockValidator.Object.Validate(patient);
+            var mockValidator = new PersonValidator<Patient>();
 
-            Assert.False(validation.IsValid);
+            Assert.ThrowsAny<InvalidPhoneNumberException>(() =>
+            {
+                mockValidator.Validate(patient);
+            });
+
             Assert.NotNull(patient.MedicalRecords);
-            Assert.Single(validation.Errors);
         }
 
         [Fact]

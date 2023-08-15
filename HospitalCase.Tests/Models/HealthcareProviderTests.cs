@@ -1,4 +1,5 @@
-﻿using HospitalCase.Domain.Models;
+﻿using HospitalCase.Domain.Exceptions;
+using HospitalCase.Domain.Models;
 using HospitalCase.Domain.Validators;
 using Moq;
 using Xunit;
@@ -23,11 +24,10 @@ namespace HospitalCase.Tests.Models
                 PhoneNumber = "+1234567890"
             };
 
-            var mockValidator = new Mock<PersonValidator>();
-            var validation = mockValidator.Object.Validate(doctor);
+            var mockValidator = new PersonValidator<HealthcareProvider>();
 
-            Assert.True(validation.IsValid);
-            Assert.Empty(validation.Errors);
+            mockValidator.Validate(doctor);
+
             Assert.Equal(firstName, doctor.FirstName);
             Assert.Equal(lastName, doctor.LastName);
             Assert.Equal(type, doctor.Type);
@@ -49,11 +49,13 @@ namespace HospitalCase.Tests.Models
                 PhoneNumber = "+1234567890"
             };
 
-            var mockValidator = new Mock<PersonValidator>();
-            var validation = mockValidator.Object.Validate(doctor);
+            var mockValidator = new PersonValidator<HealthcareProvider>();
 
-            Assert.False(validation.IsValid);
-            Assert.Single(validation.Errors);
+            Assert.ThrowsAny<InvalidCPFException>(() =>
+            {
+                mockValidator.Validate(doctor);
+            });
+
             Assert.Equal(firstName, doctor.FirstName);
             Assert.Equal(lastName, doctor.LastName);
             Assert.Equal(type, doctor.Type);
@@ -75,11 +77,13 @@ namespace HospitalCase.Tests.Models
                 PhoneNumber = "01234567890"
             };
 
-            var mockValidator = new Mock<PersonValidator>();
-            var validation = mockValidator.Object.Validate(doctor);
+            var mockValidator = new PersonValidator<HealthcareProvider>();
 
-            Assert.False(validation.IsValid);
-            Assert.Single(validation.Errors);
+            Assert.ThrowsAny<InvalidPhoneNumberException>(() =>
+            {
+                mockValidator.Validate(doctor);
+            });
+
             Assert.Equal(firstName, doctor.FirstName);
             Assert.Equal(lastName, doctor.LastName);
             Assert.Equal(type, doctor.Type);

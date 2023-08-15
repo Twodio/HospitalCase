@@ -2,7 +2,9 @@ using HospitalCase.Application.Common;
 using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Models;
 using HospitalCase.Application.Services;
+using HospitalCase.Domain.Interfaces;
 using HospitalCase.Domain.Models;
+using HospitalCase.Domain.Validators;
 using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
 using HospitalCase.Insfrastructure.Seeders;
@@ -79,9 +81,11 @@ namespace HospitalCase.WebAPI
             services.AddScoped<IMedicalRecordRepository>(s => new MedicalRecordRepository(s.GetRequiredService<HospitalCaseDbContext>()));
 
             // Register application services
+            services.AddSingleton<IValidator<HealthcareProvider>, PersonValidator<HealthcareProvider>>();
+            services.AddSingleton<IValidator<Patient>, PersonValidator<Patient>>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
-            services.AddScoped<IHealthcareProviderService>(s => new HealthcareProviderService(s.GetRequiredService<IHealthcareProviderRepository>()));
-            services.AddScoped<IPatientService>(s => new PatientService(s.GetRequiredService<IPatientRepository>()));
+            services.AddScoped<IHealthcareProviderService>(s => new HealthcareProviderService(s.GetRequiredService<IHealthcareProviderRepository>(), s.GetRequiredService<IValidator<HealthcareProvider>>()));
+            services.AddScoped<IPatientService>(s => new PatientService(s.GetRequiredService<IPatientRepository>(), s.GetRequiredService<IValidator<Patient>>()));
             services.AddScoped<IMedicalRecordService>(s => new MedicalRecordService(s.GetRequiredService<IMedicalRecordRepository>()));
             services.AddScoped<ITokenService, TokenService>();
 

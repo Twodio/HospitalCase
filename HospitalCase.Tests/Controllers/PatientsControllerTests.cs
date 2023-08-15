@@ -1,5 +1,6 @@
 ﻿using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Services;
+using HospitalCase.Domain.Interfaces;
 using HospitalCase.Domain.Models;
 using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
@@ -52,7 +53,8 @@ namespace HospitalCase.Tests.Controllers
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             var controller = new PatientsController(mockLogger.Object, mockService);
@@ -69,7 +71,8 @@ namespace HospitalCase.Tests.Controllers
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             var controller = new PatientsController(mockLogger.Object, mockService);
@@ -86,7 +89,8 @@ namespace HospitalCase.Tests.Controllers
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             var controller = new PatientsController(mockLogger.Object, mockService);
@@ -101,7 +105,8 @@ namespace HospitalCase.Tests.Controllers
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             var controller = new PatientsController(mockLogger.Object, mockService);
@@ -116,7 +121,8 @@ namespace HospitalCase.Tests.Controllers
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             var controller = new PatientsController(mockLogger.Object, mockService);
@@ -140,7 +146,8 @@ namespace HospitalCase.Tests.Controllers
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             var controller = new PatientsController(mockLogger.Object, mockService);
@@ -162,7 +169,8 @@ namespace HospitalCase.Tests.Controllers
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             var controller = new PatientsController(mockLogger.Object, mockService);
@@ -184,7 +192,8 @@ namespace HospitalCase.Tests.Controllers
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             var controller = new PatientsController(mockLogger.Object, mockService);
@@ -206,7 +215,8 @@ namespace HospitalCase.Tests.Controllers
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             var controller = new PatientsController(mockLogger.Object, mockService);
@@ -221,7 +231,8 @@ namespace HospitalCase.Tests.Controllers
         {
             IPatientRepository mockRepository = new PatientRepository(_context);
 
-            IPatientService mockService = new PatientService(mockRepository);
+            var mockValidator = new Mock<IValidator<Patient>>();
+            IPatientService mockService = new PatientService(mockRepository, mockValidator.Object);
             var mockLogger = new Mock<ILogger<PatientsController>>();
 
             var controller = new PatientsController(mockLogger.Object, mockService);
