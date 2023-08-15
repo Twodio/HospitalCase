@@ -6,6 +6,9 @@ using System.Text;
 
 namespace HospitalCase.Application.Models
 {
+    /// <summary>
+    /// Applicaton user associated with a person
+    /// </summary>
     public class ApplicationUser : IdentityUser
     {
         public int PersonId { get; set; }

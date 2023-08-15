@@ -4,6 +4,7 @@ using HospitalCase.Application.Services;
 using HospitalCase.Domain.Models;
 using HospitalCase.Insfrastructure;
 using HospitalCase.Insfrastructure.Repositories;
+using HospitalCase.Insfrastructure.Seeders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,73 +34,17 @@ namespace HospitalCase.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Local reporitory's data for HealthcareProviders
-            var healthcareproviders = new HashSet<HealthcareProvider>()
-            {
-                new HealthcareProvider()
-                {
-                    Id = 1,
-                    FirstName = "Jon",
-                    LastName = "Doe",
-                    Type = HealthcareProviderType.Doctor
-                },
-                new HealthcareProvider()
-                {
-                    Id = 2,
-                    FirstName = "Jane",
-                    LastName = "Smith",
-                    Type = HealthcareProviderType.Doctor
-                }
-            };
-
-            // Local reporitory's data for Patients
-            var patients = new HashSet<Patient>()
-            {
-                new Patient()
-                {
-                    Id = 3,
-                    FirstName = "Adam",
-                    LastName = "Willock"
-                }
-            };
-
-            // Local reporitory's data for MedicalRecords
-            var medicalRecords = new HashSet<MedicalRecord>()
-            {
-                new MedicalRecord()
-                {
-                    Id = 1,
-                    Patient = patients.Single(p => p.Id == 3),
-                    HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 1),
-                    RecordDate = new DateTime(2023, 08, 13),
-                    Diagnosis = "Flu"
-                },
-                new MedicalRecord()
-                {
-                    Id = 2,
-                    Patient = patients.Single(p => p.Id == 3),
-                    HealthcareProvider = healthcareproviders.Single(hp =>  hp.Id == 2),
-                    RecordDate = new DateTime(2020, 08, 13),
-                    Diagnosis = "Covid-19"
-                }
-            };
-
-            // Configure Entity Framework Database
+            // Configure and Register DbContext
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<HospitalCaseDbContext>(options => options.UseSqlServer(connectionString));
 
-            Action<DbContextOptionsBuilder> optionsBuilder = (options) => options.UseSqlServer(connectionString);
-
-            // Register Entity Framework
-            services.AddSingleton<HospitalCaseDbContextFactory>(new HospitalCaseDbContextFactory());
-            services.AddSingleton<IDesignTimeDbContextFactory<HospitalCaseDbContext>, HospitalCaseDbContextFactory>(s => s.GetRequiredService<HospitalCaseDbContextFactory>());
-            services.AddDbContext<HospitalCaseDbContext>(optionsBuilder);
-
-            // Configure Identity
+            // Register Identity
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<HospitalCaseDbContext>()
                 .AddDefaultTokenProviders();
 
-            // Configure JWT Authentication
+            // Configure and register JWT Authentication
+            // TODO: Use a class instead of key values
             var key = Encoding.ASCII.GetBytes(Configuration["Jwt:key"]);
 
             services.AddAuthentication(options =>
@@ -120,26 +65,34 @@ namespace HospitalCase.WebAPI
             });
 
             // Register repositories
-            services.AddSingleton<IHealthcareProviderRepository>(s => new HealthcareProviderRepository(s.GetRequiredService<HospitalCaseDbContext>()));
-            services.AddSingleton<IPatientRepository>(s => new PatientRepository(s.GetRequiredService<HospitalCaseDbContext>()));
-            services.AddSingleton<IMedicalRecordRepository>(s => new MedicalRecordRepository(s.GetRequiredService<HospitalCaseDbContext>()));
+            services.AddScoped<IHealthcareProviderRepository>(s => new HealthcareProviderRepository(s.GetRequiredService<HospitalCaseDbContext>()));
+            services.AddScoped<IPatientRepository>(s => new PatientRepository(s.GetRequiredService<HospitalCaseDbContext>()));
+            services.AddScoped<IMedicalRecordRepository>(s => new MedicalRecordRepository(s.GetRequiredService<HospitalCaseDbContext>()));
 
-            // Register domain services
-            services.AddSingleton<IHealthcareProviderService>(s => new HealthcareProviderService(s.GetRequiredService<IHealthcareProviderRepository>()));
-            services.AddSingleton<IPatientService>(s => new PatientService(s.GetRequiredService<IPatientRepository>()));
-            services.AddSingleton<IMedicalRecordService>(s => new MedicalRecordService(s.GetRequiredService<IMedicalRecordRepository>()));
+            // Register application services
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IHealthcareProviderService>(s => new HealthcareProviderService(s.GetRequiredService<IHealthcareProviderRepository>()));
+            services.AddScoped<IPatientService>(s => new PatientService(s.GetRequiredService<IPatientRepository>()));
+            services.AddScoped<IMedicalRecordService>(s => new MedicalRecordService(s.GetRequiredService<IMedicalRecordRepository>()));
+
+            // Register other dependencies
+            services.AddTransient<IDesignTimeDbContextFactory<HospitalCaseDbContext>, HospitalCaseDbContextFactory>(s => s.GetRequiredService<HospitalCaseDbContextFactory>());
 
             // Register Controllers
             services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, RoleManager<IdentityRole> roleManager)
         {
+            // Middlewates
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            // Seed data
+            RoleSeeder.SeedRolesAsync(roleManager).Wait();
 
             app.UseHttpsRedirection();
 
