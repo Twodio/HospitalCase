@@ -20,6 +20,8 @@ O projeto é organizado em várias camadas para seguir os princípios da Clean A
 - **SQLServer**: Como sistema de gestão de base de dados.
 - **Moq**: Para testes unitários.
 
+**NOTA:** NET CORE SDK 3.1
+
 ## Configuração e Instalação
 
 1. **Clone o Repositório**: \`git clone [https://github.com/Twodio/HospitalCase.git](https://github.com/Twodio/HospitalCase)\`
