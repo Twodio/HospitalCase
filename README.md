@@ -22,7 +22,7 @@ O projeto é organizado em várias camadas para seguir os princípios da Clean A
 
 ## Configuração e Instalação
 
-1. **Clone o Repositório**: \`git clone [https://github.com/seu-usuario/NomeDoProjeto.git](https://github.com/Twodio/HospitalCase)\`
+1. **Clone o Repositório**: \`git clone [https://github.com/Twodio/HospitalCase.git](https://github.com/Twodio/HospitalCase)\`
 2. **Instale as Dependências**: Utilize o NuGet Package Manager ou execute \`dotnet restore\` na raiz do projeto.
 3. **Configure a Base de Dados**: Edite a connection string no arquivo \`appsettings.json\` na camada WebAPI.
 4. **Execute as Migrações**: Utilize o comando \`dotnet ef database update\` para aplicar as migrações à base de dados.
