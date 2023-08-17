@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using ClaimTypes = HospitalCase.Application.Common.ClaimTypes;
 
 namespace HospitalCase.WebAPI.Controllers
 {
@@ -42,7 +45,10 @@ namespace HospitalCase.WebAPI.Controllers
             try
             {
                 var result = await _medicalRecordsService.GetAllAsync();
-                return Ok(result);
+
+                var userId = User.FindFirstValue(ClaimTypes.PersonId);
+
+                return Ok(result.Where(r => r.PatientId.ToString() == userId).ToList());
             }
             catch (Exception ex)
             {
@@ -73,6 +79,10 @@ namespace HospitalCase.WebAPI.Controllers
                 var foundEntry = await _medicalRecordsService.GetByIdAsync(id);
 
                 if (foundEntry == null) return NotFound();
+
+                var userId = User.FindFirstValue(ClaimTypes.PersonId);
+
+                if (userId != foundEntry.PatientId.ToString()) return Forbid();
 
                 return Ok(foundEntry);
             }

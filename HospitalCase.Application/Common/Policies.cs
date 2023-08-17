@@ -63,12 +63,18 @@ namespace HospitalCase.Application.Common
     /// </summary>
     public static class PatientsPolicies
     {
+        public const string ViewAll = "PatientsPolicies.View.All";
         public const string View = "PatientsPolicies.View";
         public const string Create = "PatientsPolicies.Create";
         public const string Edit = "PatientsPolicies.Edit";
 
         public static void AddPatientsPolicies(this AuthorizationOptions options)
         {
+            options.AddPolicy(ViewAll, policy =>
+            {
+                policy.RequireRole(UserRoles.Nurse, UserRoles.Doctor);
+            });
+
             options.AddPolicy(View, policy =>
             {
                 policy.RequireRole(UserRoles.Patient, UserRoles.Nurse, UserRoles.Doctor);

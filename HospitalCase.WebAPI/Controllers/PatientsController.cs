@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.JsonWebTokens;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using ClaimTypes = HospitalCase.Application.Common.ClaimTypes;
 
 namespace HospitalCase.WebAPI.Controllers
 {
@@ -33,7 +36,7 @@ namespace HospitalCase.WebAPI.Controllers
         /// <returns>Detailed information of the patients</returns>
         /// <response code="200">Returns the patients list</response>
         /// <response code="500">If there is a server error</response>
-        [Authorize(Policy = PatientsPolicies.View)]
+        [Authorize(Policy = PatientsPolicies.ViewAll)]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -69,6 +72,10 @@ namespace HospitalCase.WebAPI.Controllers
         {
             if (id <= 0) return BadRequest();
 
+            var userId = User.FindFirstValue(ClaimTypes.PersonId);
+
+            if (userId != id.ToString()) return Forbid();
+
             try
             {
                 var foundEntry = await _patientsService.GetByIdAsync(id);
@@ -97,6 +104,8 @@ namespace HospitalCase.WebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Post(Patient patient)
         {
+            // Validate authenticated user or return forbiden
+
             // TODO: BadRequest when the request has invalid first, last names or invalid phone number and cpf
             try
             {
@@ -131,6 +140,8 @@ namespace HospitalCase.WebAPI.Controllers
 
             if (id != patient.Id) return BadRequest();
 
+            // Validate authenticated user or return forbiden
+
             try
             {
                 var foundEntry = await _patientsService.GetByIdAsync(id);
@@ -164,6 +175,8 @@ namespace HospitalCase.WebAPI.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0) return BadRequest();
+
+            // Validate authenticated user or return forbiden
 
             try
             {

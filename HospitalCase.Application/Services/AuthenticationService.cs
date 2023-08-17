@@ -19,13 +19,19 @@ namespace HospitalCase.Application.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ITokenService _tokenService;
+        private readonly IPatientService _patientService;
+        private readonly IHealthcareProviderService _healthcareProviderService;
 
-        public AuthenticationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService)
+        public AuthenticationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUnitOfWork unitOfWork, ITokenService tokenService, IPatientService patientService, IHealthcareProviderService healthcareProviderService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _unitOfWork = unitOfWork;
             _tokenService = tokenService;
+            _patientService = patientService;
+            _healthcareProviderService = healthcareProviderService;
         }
 
         public async Task<LoginResult> LoginAsync(LoginRequest request)
@@ -64,95 +70,123 @@ namespace HospitalCase.Application.Services
         {
             // Validate
 
-            // Create the user (defaults to patient)
-            var user = new ApplicationUser()
+            await _unitOfWork.BeginTransationAsync();
+            try
             {
-                UserName = request.Username,
-                Person = new Patient()
+                var patient = new Patient()
                 {
                     FirstName = request.FirstName,
                     LastName = request.LastName,
                     CPF = request.CPF,
                     PhoneNumber = request.PhoneNumber,
-                }
-            };
+                };
 
-            // TODO: Can be refactored
+                var createdPatient = await _patientService.CreateAsync(patient);
 
-            // Save the user
-            var signUpResult = await _userManager.CreateAsync(user, request.Password);
-
-            // Add to a role
-            await _userManager.AddToRoleAsync(user, UserRoles.Patient);
-
-            var result = new RegistrationResult();
-
-            // If there is any error
-            if (signUpResult.Errors?.Count() > 0)
-            {
-                foreach (var error in signUpResult.Errors)
+                // Create the user (defaults to patient)
+                var user = new ApplicationUser()
                 {
-                    result.Errors.Add(error.Description);
+                    UserName = request.Username,
+                    Person = createdPatient
+                };
+
+                // TODO: Can be refactored
+
+                // Save the user
+                var signUpResult = await _userManager.CreateAsync(user, request.Password);
+
+                // Add to a role
+                await _userManager.AddToRoleAsync(user, UserRoles.Patient);
+
+                var result = new RegistrationResult();
+
+                // If there is any error
+                if (signUpResult.Errors?.Count() > 0)
+                {
+                    foreach (var error in signUpResult.Errors)
+                    {
+                        result.Errors.Add(error.Description);
+                    }
+
+                    result.Success = false;
+
+                    return result;
                 }
 
-                result.Success = false;
+                result.Success = true;
+                result.Message = "Success";
+                result.UserId = user.Id;
 
+                await _unitOfWork.CommitAsync();
                 return result;
             }
-
-            result.Success = true;
-            result.Message = "Success";
-            result.UserId = user.Id;
-
-            return result;
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<RegistrationResult> RegisterHealthcareProviderAsync(HealthcareProviderRegistrationRequest request)
         {
             // Validate
 
-            // Create the user (defaults to patient)
-            var user = new ApplicationUser()
+            await _unitOfWork.BeginTransationAsync();
+            try
             {
-                UserName = request.Username,
-                Person = new HealthcareProvider()
+                var healthcareProvider = new HealthcareProvider()
                 {
                     FirstName = request.FirstName,
                     LastName = request.LastName,
                     CPF = request.CPF,
                     PhoneNumber = request.PhoneNumber,
                     Type = request.Type
-                }
-            };
+                };
 
-            // TODO: Can be refactored
+                var createdHealthcareProvider = await _healthcareProviderService.CreateAsync(healthcareProvider);
 
-            // Save the user
-            var signUpResult = await _userManager.CreateAsync(user, request.Password);
-
-            // Add to a role
-            await _userManager.AddToRoleAsync(user, UserRoles.FromType(request.Type));
-
-            var result = new RegistrationResult();
-
-            // If there is any error
-            if (signUpResult.Errors?.Count() > 0)
-            {
-                foreach (var error in signUpResult.Errors)
+                // Create the user (defaults to patient)
+                var user = new ApplicationUser()
                 {
-                    result.Errors.Add(error.Description);
+                    UserName = request.Username,
+                    Person = createdHealthcareProvider
+                };
+
+                // TODO: Can be refactored
+
+                // Save the user
+                var signUpResult = await _userManager.CreateAsync(user, request.Password);
+
+                // Add to a role
+                await _userManager.AddToRoleAsync(user, UserRoles.FromType(request.Type));
+
+                var result = new RegistrationResult();
+
+                // If there is any error
+                if (signUpResult.Errors?.Count() > 0)
+                {
+                    foreach (var error in signUpResult.Errors)
+                    {
+                        result.Errors.Add(error.Description);
+                    }
+
+                    result.Success = false;
+
+                    return result;
                 }
 
-                result.Success = false;
+                result.Success = true;
+                result.Message = "Success";
+                result.UserId = user.Id;
 
+                await _unitOfWork.CommitAsync();
                 return result;
             }
-
-            result.Success = true;
-            result.Message = "Success";
-            result.UserId = user.Id;
-
-            return result;
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
         }
     }
 }

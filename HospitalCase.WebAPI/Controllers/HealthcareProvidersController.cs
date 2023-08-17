@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using ClaimTypes = HospitalCase.Application.Common.ClaimTypes;
 
 namespace HospitalCase.WebAPI.Controllers
 {
@@ -67,6 +69,10 @@ namespace HospitalCase.WebAPI.Controllers
         public async Task<IActionResult> Get(int id)
         {
             if (id <= 0) return BadRequest();
+
+            var userId = User.FindFirstValue(ClaimTypes.PersonId);
+
+            if (userId != id.ToString()) return Forbid();
 
             try
             {

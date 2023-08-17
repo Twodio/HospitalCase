@@ -1,4 +1,5 @@
-﻿using HospitalCase.Application.Interfaces;
+﻿using HospitalCase.Application.Common;
+using HospitalCase.Application.Interfaces;
 using HospitalCase.Application.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using ClaimTypes = System.Security.Claims.ClaimTypes;
 
 namespace HospitalCase.Application.Services
 {
@@ -32,6 +34,7 @@ namespace HospitalCase.Application.Services
             var claims = new List<Claim>()
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(Common.ClaimTypes.PersonId, user.PersonId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 

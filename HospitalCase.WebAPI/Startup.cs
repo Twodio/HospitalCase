@@ -46,9 +46,14 @@ namespace HospitalCase.WebAPI
                 .AddEntityFrameworkStores<HospitalCaseDbContext>()
                 .AddDefaultTokenProviders();
 
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             // Configure and register JWT Authentication
             // TODO: Use a class instead of key values
             var key = Encoding.ASCII.GetBytes(Configuration["Jwt:key"]);
+
+            // Register CORS
+            services.AddCors();
 
             services.AddAuthentication(options =>
             {
@@ -111,6 +116,13 @@ namespace HospitalCase.WebAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(options =>
+            {
+                options.AllowAnyMethod();
+                options.AllowAnyHeader();
+                options.AllowAnyOrigin();
+            });
 
             app.UseAuthentication();
             app.UseAuthorization();
