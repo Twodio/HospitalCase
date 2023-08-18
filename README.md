@@ -4,6 +4,8 @@
 
 Esta é uma aplicação de backend desenvolvida para gerir gestão de fichas de um hospital, incluindo autenticação e autorização com funções, gestão de pacientes, médicos, registos médicos, e outras entidades relacionadas.
 
+Este projeto foi criado para uma apresentação com uma outra parte em NextJS, mas não as terminei a tempo e falta ainda muita coisa essensial, contudo, cumpriu o seu papel e não fiquei sem nada para entregar. Estarei a continuar o projeto com atualizações semanais ou ocasionais, podem observar, clonar ou contribuir.
+
 ## Estrutura do Projeto
 
 O projeto é organizado em várias camadas para seguir os princípios da Clean Architecture:
@@ -37,3 +39,5 @@ A API expõe vários endpoints para gerir pacientes, médicos, registos médicos
 ## Testes
 
 O projeto inclui testes unitários para modelos, repositórios, serviços, e controladores. Os testes podem ser executados utilizando o comando \`dotnet test\`.
+
+Não foram adicionados testes para auenticação, registo, serviço de criação de token e alguns outros que me terei esquecido. Serão adicionados eventualmente.
